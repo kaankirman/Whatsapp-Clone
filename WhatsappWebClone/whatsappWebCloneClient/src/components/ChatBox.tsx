@@ -1,6 +1,6 @@
 import profilePlaceholder from '../assets/media/profilePlaceholder.png';
 import { Image } from 'react-bootstrap';
-import { chatBoxStyle } from '../assets/appStyles';
+import { chatBoxStyle } from '../assets/homeStyles';
 
 function ChatBox() {
     return (

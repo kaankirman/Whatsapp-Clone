@@ -1,15 +1,12 @@
+import Toolbar from "../components/Toolbar"
+import ChatsContainer from "../components/ChatsContainer"
+import ChatBox from "../components/ChatBox"
+import { appStyle } from "../assets/homeStyles"
 
-import Toolbar from "./components/Toolbar"
-import ChatsContainer from "./components/ChatsContainer"
-import ChatBox from "./components/ChatBox"
-import { appStyle } from "./assets/appStyles"
-
-function App() {
+function Home() {
 
   return (
     <div>
-
-
       <div style={appStyle.mainContainer}>
         <div style={{ display: "flex", flexDirection: "column", width: "40%" }}>
           <Toolbar />
@@ -21,4 +18,4 @@ function App() {
   )
 }
 
-export default App
+export default Home

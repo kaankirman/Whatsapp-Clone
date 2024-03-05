@@ -3,7 +3,7 @@ import profilePlaceholder from "../assets/media/profilePlaceholder.png";
 import menuIcon from "../assets/media/menuIcon.png";
 import newChatIcon from "../assets/media/newChatIcon.png";
 import searchIcon from "../assets/media/searchIcon.png";
-import { toolbarStyle } from "../assets/appStyles";
+import { toolbarStyle } from "../assets/homeStyles";
 
 function Toolbar() {
     return (

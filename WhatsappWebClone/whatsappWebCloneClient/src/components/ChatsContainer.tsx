@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Chat from './Chat';
 import profilePlaceholder from '../assets/media/profilePlaceholder.png';
-import { chatsContainerStyle } from '../assets/appStyles';
+import { chatsContainerStyle } from '../assets/homeStyles';
 
 function ChatsContainer() {
     const [selectedChatIndex, setSelectedChatIndex] = useState<number | null>(null); // Specify the type as number or null

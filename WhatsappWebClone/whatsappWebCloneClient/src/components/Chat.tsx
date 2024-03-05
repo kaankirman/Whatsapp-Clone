@@ -1,5 +1,5 @@
 import { Image } from 'react-bootstrap';
-import { accentColor, frameColor, chatStyle } from '../assets/appStyles';
+import { accentColor, frameColor, chatStyle } from '../assets/homeStyles';
 
 interface ChatProps {
     image: string;

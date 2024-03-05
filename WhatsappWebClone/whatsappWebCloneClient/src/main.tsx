@@ -1,9 +1,10 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import Welcome from './Welcome.tsx'
+import { RouterProvider } from 'react-router-dom'
+import {Routes} from './Routes/Routes.tsx'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <Welcome />
+    <RouterProvider router={Routes}/>
   </React.StrictMode>,
 )

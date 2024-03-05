@@ -1,12 +1,14 @@
 import { useState } from 'react';
-import { styles } from './assets/welcomeStyles';
-import backgroundGif from './assets/media/WelcomeBg.mp4';
+import { styles } from '../assets/welcomeStyles';
+import backgroundGif from '../assets/media/WelcomeBg.mp4';
+import {useNavigate} from 'react-router-dom';
 
 const Welcome = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [signUpClick, setSignUpClick] = useState(false);
     const [passwordCheck, setPasswordCheck] = useState('');
+    const navigate = useNavigate();
     const serverUrl = import.meta.env.VITE_BASE_URL;
 
     const handleLogin = async () => {
@@ -23,7 +25,9 @@ const Welcome = () => {
                 }),
             });
             const data = await response.json();
-            window.location.reload();
+            if (data.accessToken) {
+               navigate('/home');
+            }
         }
     };
 
@@ -40,6 +44,7 @@ const Welcome = () => {
                     email: email,
                     password: password,
                 }),
+                
             });
             const data = await response.json();
             window.location.reload();
