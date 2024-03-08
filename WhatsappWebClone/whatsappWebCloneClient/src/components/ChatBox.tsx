@@ -1,8 +1,14 @@
 import profilePlaceholder from '../assets/media/profilePlaceholder.png';
 import { Image } from 'react-bootstrap';
 import { chatBoxStyle } from '../assets/homeStyles';
+import { useState } from 'react';
+import sendIcon from '../assets/media/sendIcon.png';
 
 function ChatBox() {
+    const [message, setMessage] = useState('');
+    function sendMessage() {
+        // Send the message to the server
+    }
     return (
         <div style={chatBoxStyle.mainContainer}>
             <div style={chatBoxStyle.userContainer}>
@@ -12,9 +18,15 @@ function ChatBox() {
             <div style={chatBoxStyle.chatContent}>
                 {/* Content of the chat box */}
             </div>
-            <div style={{...chatBoxStyle.inputContainer}}>
-                <input style={chatBoxStyle.messageInput} placeholder="Search or start new chat" />
-            </div>        
+            <div style={{ ...chatBoxStyle.inputContainer }}>
+                <div style={chatBoxStyle.inputBorder}>
+                    <input style={chatBoxStyle.messageInput} placeholder="Search or start new chat"
+                        type="text"
+                        value={message}
+                        onChange={(e) => setMessage(e.target.value)} />
+                    {message ?(<img src={sendIcon} style={chatBoxStyle.sendIcon} onClick={sendMessage} alt="" />):null}
+                </div>
+            </div>
         </div>
     );
 }

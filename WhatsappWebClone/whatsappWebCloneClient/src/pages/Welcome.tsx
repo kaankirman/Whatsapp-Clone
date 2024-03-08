@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { styles } from '../assets/welcomeStyles';
 import backgroundGif from '../assets/media/WelcomeBg.mp4';
-import {useNavigate} from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Welcome = () => {
     const [email, setEmail] = useState('');
@@ -25,8 +27,11 @@ const Welcome = () => {
                 }),
             });
             const data = await response.json();
+            const notify = () => toast(data.message,
+                { position: "top-center", autoClose: 1000, hideProgressBar: true, closeOnClick: true, pauseOnHover: true, });
+            notify();
             if (data.accessToken) {
-               navigate('/home');
+                navigate('/home');
             }
         }
     };
@@ -44,16 +49,19 @@ const Welcome = () => {
                     email: email,
                     password: password,
                 }),
-                
+
             });
             const data = await response.json();
-            window.location.reload();
+            if (data.accessToken) {
+                navigate('/home');
+            }
         }
     };
 
     return (
         <div style={{ ...styles.content }}>
-          <video src={backgroundGif} autoPlay muted loop style={styles.backgroundVideo} />
+            <ToastContainer />
+            <video src={backgroundGif} autoPlay muted loop style={styles.backgroundVideo} />
             <div style={styles.cardDiv}>
                 <h1 style={{ ...styles.logo }} onClick={() => window.location.reload()}>Get2Connect</h1>
                 <div style={{ ...styles.textField }}>
@@ -94,4 +102,3 @@ const Welcome = () => {
 };
 
 export default Welcome;
-

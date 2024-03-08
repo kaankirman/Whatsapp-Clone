@@ -6,15 +6,13 @@ import { appStyle } from "../assets/homeStyles"
 function Home() {
 
   return (
-    <div>
       <div style={appStyle.mainContainer}>
-        <div style={{ display: "flex", flexDirection: "column", width: "40%" }}>
+        <div style={appStyle.subContainer}>
           <Toolbar />
           <ChatsContainer />
         </div>
         <ChatBox />
       </div>
-    </div>
   )
 }
 
