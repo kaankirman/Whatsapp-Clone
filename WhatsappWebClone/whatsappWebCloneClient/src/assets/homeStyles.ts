@@ -43,6 +43,12 @@ type ToolbarStyles = {
   searchInput: React.CSSProperties;
   list: React.CSSProperties;
   listItem: React.CSSProperties;
+  friendSearchInput: React.CSSProperties;
+  friendList: React.CSSProperties;
+  addIcon: React.CSSProperties;
+  firendListSearchContainer: React.CSSProperties;
+  friendListItem: React.CSSProperties;
+  friendListPendingContainer: React.CSSProperties;
 };
 
 export const toolbarStyle: ToolbarStyles = {
@@ -77,6 +83,20 @@ export const toolbarStyle: ToolbarStyles = {
     margin: "1vh 0vh 1vh 0vh",
     width: "95%",
   },
+  firendListSearchContainer: {
+    ...defaultStyle.flexRow,
+    width: "auto",
+    alignItems: "center",
+    margin: "6px",
+    border: `0.1px solid ${accentColor}`,
+    borderRadius: "8px",
+  },
+  friendListPendingContainer: {
+    maxHeight:"185px",
+    whiteSpace:"nowrap",
+    overflow:"auto",
+    scrollbarWidth:"none"
+  },
   profileIcon: {
     width: "50px",
     height: "50px",
@@ -86,6 +106,12 @@ export const toolbarStyle: ToolbarStyles = {
     height: "30px",
     cursor: "pointer",
   },
+  addIcon: {
+    width: "25px",
+    height: "25px",
+    cursor: "pointer",
+    marginRight: "5px",
+  },
   searchIcon: {
     width: "20px",
     height: "20px",
@@ -94,26 +120,95 @@ export const toolbarStyle: ToolbarStyles = {
     background: accentColor,
     border: "none",
     outline: "none",
-    marginLeft: "1vh",
     color: "white",
-    width:"cover",
+    width: "cover",
+  },
+  friendSearchInput: {
+    background: frameColor,
+    outline: "none",
+    border: "none",
+    borderRadius: "8px",
+    margin: "3px",
+    fontSize: "1.4em",
+    color: "white",
+    width: "250px",
   },
   list: {
     position: "absolute",
     top: "30px",
-    right: "0px",
-    background: accentColor,
+    left: "20px",
+    background: frameColor,
     borderRadius: "8px",
     listStyle: "none",
     padding: "5px",
     width: "180px",
     boxShadow: "0 0 5px 0px black",
   },
+  friendList: {
+    position: "absolute",
+    top: "47px",
+    left: "-10px",
+    background: frameColor,
+    borderRadius: "8px",
+    listStyle: "none",
+    width: "auto",
+    boxShadow: "0 0 5px 0px black",
+    padding: 0,
+    margin: 0,
+  },
   listItem: {
     color: "white",
     cursor: "pointer",
     padding: "2px",
     paddingLeft: "10px",
+  },
+  friendListItem: {
+    color: "white",
+  },
+};
+
+type FriendRequestStyles = {
+  mainContainer: React.CSSProperties;
+  textContainer: React.CSSProperties;
+  image: React.CSSProperties;
+  text: React.CSSProperties;
+  buttonContainer: React.CSSProperties;
+  button: React.CSSProperties;
+};
+
+export const friendRequestStyle: FriendRequestStyles = {
+  mainContainer: {
+    ...defaultStyle.flexRow,
+    position:"relative",
+    alignItems: "center",
+    justifyContent:"left",
+    width:"270px",
+    margin:"5px"
+  },
+  textContainer: {
+    ...defaultStyle.flexColumn,
+    justifyContent: "center",
+    padding: 0,
+    marginLeft: "5px",
+  },
+  image: {
+    width: "40px",
+    height: "40px",
+    borderRadius: "50%",
+  },
+  text: {
+    margin: "0px",
+    color: "white",
+  },
+  buttonContainer: {
+    ...defaultStyle.flexRow,
+    position: "absolute",
+    right: "5px",
+    height: "30px",
+    width: "30px",
+  },
+  button: {
+    padding: "2px",
   },
 };
 
@@ -129,8 +224,7 @@ export const chatsContainerStyle: ChatsContainerStyles = {
     overflow: "auto",
     height: "90vh",
     borderRadius: "0 0 0 1vh",
-    scrollbarColor: `${accentColor} ${frameColor}`,
-    scrollbarWidth: "thin",
+    scrollbarWidth: "none",
   },
 };
 
@@ -219,7 +313,7 @@ export const chatBoxStyle: ChatBoxStyles = {
     outline: "none",
     color: "white",
     margin: "1vh 0 1vh 1vh",
-    width:"99%",
+    width: "99%",
   },
   userIcon: {
     width: "50px",
@@ -227,7 +321,7 @@ export const chatBoxStyle: ChatBoxStyles = {
   },
   userName: {
     margin: "1vh",
-    color:"white"
+    color: "white",
   },
   sendIcon: {
     cursor: "pointer",
@@ -249,7 +343,6 @@ export const appStyle: AppStyles = {
     margin: "2vh 5vh 2vh 5vh",
     boxShadow: "0 0 50px 0px black",
     background: frameColor,
-    
   },
   subContainer: {
     ...defaultStyle.flexColumn,
@@ -301,8 +394,8 @@ export const profileModalContentStyle: ProfileModalContentStyles = {
     margin: "20px",
   },
   input: {
-    background:frameColor,
-    border:`1px solid ${accentColor}`,
+    background: frameColor,
+    border: `1px solid ${accentColor}`,
     borderRadius: "8px",
     fontSize: "1em",
     color: "white",

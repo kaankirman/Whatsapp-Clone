@@ -6,13 +6,23 @@
     <title>Whatsapp clone</title>
     <style>
       body {
-        background: url("./src/assets/media/bg.jpg");
-        background-size: cover;
+        margin: 0;
+        overflow: hidden;
+      }
+      video {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: -1;
       }
     </style>
   </head>
   <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <video src="./src/assets/media/WelcomeBg.mp4" autoplay muted loop></video>
+      <div id="root"></div>
+      <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

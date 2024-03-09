@@ -31,7 +31,7 @@ const Welcome = () => {
                 { position: "top-center", autoClose: 1000, hideProgressBar: true, closeOnClick: true, pauseOnHover: true, });
             notify();
             if (data.accessToken) {
-                navigate('/home');
+                navigate('/home', { state: { data } });
             }
         }
     };

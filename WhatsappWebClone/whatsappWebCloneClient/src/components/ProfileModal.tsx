@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Modal from 'react-modal';
 import Image from 'react-bootstrap/Image';
 import profilePlaceholder from '../assets/media/bg.jpg';
@@ -7,19 +7,40 @@ import { profileModalContentStyle, profileModalStyle } from '../assets/homeStyle
 interface ModalProps {
     isOpen: boolean;
     onClose: () => void;
+    userData: {
+        name: string;
+        status: string;
+        email: string;
+    };
 }
 
-const ProfileModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
+
+const ProfileModal: React.FC<ModalProps> = ({ isOpen, onClose, userData }) => {
+    const serverUrl = import.meta.env.VITE_BASE_URL;
     const [name, setName] = useState<string>('');
     const [status, setStatus] = useState<string>('');
+    useEffect(() => { Modal.setAppElement('#root'); }, []);
 
-    const handleSubmit = () => {
-        // Add your logic to handle the form submission
-        // For example, you can send the data to a server or perform local actions
-        console.log('Name:', name);
-        console.log('Status:', status);
-
-        // Close the modal after handling the submission
+    const handleSubmit = async () => {
+        const formData = new FormData();
+        if (name != userData.name) {
+            formData.append('name', name);
+            userData.name = name;
+        }
+        if (status != userData.status) {
+            formData.append('status', status);
+            userData.status = status;
+        }
+        try {
+            const response: Response = await fetch(`${serverUrl}/users/${userData.email}`, {
+                method: 'PATCH',
+                body: formData,
+            });
+            const data = await response.json();
+            console.log(data);
+        } catch (error) {
+            console.log(error);
+        }
         onClose();
     };
 
@@ -27,8 +48,8 @@ const ProfileModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
         <Modal isOpen={isOpen} onRequestClose={onClose} style={profileModalStyle} contentLabel="Example Modal">
             <Image src={profilePlaceholder} roundedCircle style={profileModalContentStyle.image} />
             <div style={profileModalContentStyle.inputDiv}>
-                <input placeholder='Name' type="text" value={name} style={profileModalContentStyle.input} onChange={(e) => setName(e.target.value)} />
-                <input placeholder='Status' type="text" value={status} style={profileModalContentStyle.input} onChange={(e) => setStatus(e.target.value)} />
+                <input placeholder='Name' type="text" value={userData.name} style={profileModalContentStyle.input} onChange={(e) => setName(e.target.value)} />
+                <input placeholder='Status' type="text" value={userData.status} style={profileModalContentStyle.input} onChange={(e) => setStatus(e.target.value)} />
             </div>
             <div style={profileModalContentStyle.buttonDiv}>
                 <button style={profileModalContentStyle.button} onClick={handleSubmit}>Save</button>

@@ -7,6 +7,7 @@ const { v4: uuidv4 } = require('uuid');
 const bcrypt = require('bcrypt');
 const token = require('jsonwebtoken');
 const multer = require('multer');
+const upload = multer();
 
 app.use(cors());
 app.use(express.json());
@@ -36,10 +37,21 @@ app.post('/login', async (req, res) => {
         const success = await bcrypt.compare(password, users.rows[0].hashed_password)
         const accessToken = token.sign({ email: email }, "secret", { expiresIn: "1h" });
         if (success) {
-            res.json({ 'email': users.rows[0].email, accessToken: accessToken, 'url': users.rows[0].url })
+            res.json({ 'email': users.rows[0].email, accessToken: accessToken, 'url': users.rows[0].url, 'name': users.rows[0].name, 'status': users.rows[0].status })
         } else {
             res.json({ message: "Wrong password" })
         }
+    } catch (error) {
+        console.error(error);
+    }
+});
+
+app.patch('/users/:email', upload.none(), async (req, res) => {
+    const { email } = req.params;
+    const { name, status } = req.body;
+    try {
+        await pool.query('UPDATE users SET name = $1, status = $2 WHERE email = $3', [name, status, email]);
+        res.json({ message: "User updated successfully" });
     } catch (error) {
         console.error(error);
     }
