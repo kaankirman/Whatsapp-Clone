@@ -46,6 +46,7 @@ app.post('/login', async (req, res) => {
     }
 });
 
+//modify user
 app.patch('/users/:email', upload.none(), async (req, res) => {
     const { email } = req.params;
     const { name, status } = req.body;
@@ -57,6 +58,7 @@ app.patch('/users/:email', upload.none(), async (req, res) => {
     }
 });
 
+//send friend request
 app.post('/friendRequests', async (req, res) => {
     const { senderId, receiverId, senderName } = req.body;
 
@@ -73,6 +75,7 @@ app.post('/friendRequests', async (req, res) => {
     }
 });
 
+//get friend requests
 app.get('/friendRequests/:receiverId', async (req, res) => {
     const { receiverId } = req.params;
 
@@ -88,6 +91,68 @@ app.get('/friendRequests/:receiverId', async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+
+//delete friend request
+app.delete('/friendRequests/:request_id', async (req, res) => {
+    const requestId = parseInt(req.params.request_id);
+
+    try {
+        const result = await pool.query('DELETE FROM friend_requests WHERE request_id = $1 RETURNING *', [requestId]);
+
+        if (result.rows.length === 0) {
+            res.status(404).json({ error: 'Friend request not found' });
+        } else {
+            res.status(200).json(result.rows[0]);
+        }
+    } catch (error) {
+        console.error('Error deleting friend request:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+//accept friend request
+app.post('/friends', async (req, res) => {
+    const { senderId, receiverId } = req.body;
+
+    try {
+        const result = await pool.query(
+            'INSERT INTO friends (sender_id, receiver_id, status) VALUES ($1, $2, $3) RETURNING *',
+            [senderId, receiverId, 'accepted']
+        );
+
+        res.json(result.rows[0]);
+    } catch (error) {
+        console.error('Error adding friend request:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+//get friends
+app.get('/friends/:userId', async (req, res) => {
+    const { userId } = req.params;
+
+    try {
+        const emailResult = await pool.query(
+            'SELECT sender_id AS friend_email FROM friends WHERE receiver_id = $1 UNION SELECT receiver_id AS friend_email FROM friends WHERE sender_id = $1;',
+            [userId]
+        );
+        const friendEmails = emailResult.rows.map(row => row.friend_email);
+
+        // Step 2: Fetch user data for each friend
+        const userDataPromises = friendEmails.map(async (friendEmail) => {
+            const userDataResult = await pool.query('SELECT email, name, status FROM users WHERE email = $1', [friendEmail]);
+            return userDataResult.rows[0];
+        });
+
+        const userData = await Promise.all(userDataPromises);
+
+        res.json(userData);
+    } catch (error) {
+        console.error('Error retrieving friend data:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
 
 /* //get existing files
 app.get('/files/:email', async (req, res) => {

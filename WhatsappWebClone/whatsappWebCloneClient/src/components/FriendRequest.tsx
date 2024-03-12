@@ -3,13 +3,63 @@ import denyIcon from "../assets/media/denyIcon.png";
 import Image from "react-bootstrap/Image";
 import bg from "../assets/media/bg.jpg";
 import { friendRequestStyle } from "../assets/homeStyles";
+import { useState } from "react";
 interface FriendRequestProps {
     email: string;
     name: string;
-    requestId:number;
+    requestId: number;
 }
 
-function FriendRequest({ email, name }: FriendRequestProps) {
+function FriendRequest({ email, name, requestId }: FriendRequestProps) {
+    const serverUrl = import.meta.env.VITE_BASE_URL;
+    const [isRequestAccepted, setIsRequestAccepted] = useState(false);
+
+
+    const handleRequest = async () => {
+        try {
+            const response = await fetch(`${serverUrl}/friendRequests/${requestId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error('error deleting friend request');
+            }
+            const data = await response.json();
+            if (isRequestAccepted) {
+                handleAddFriend(data.sender_id, data.receiver_id);
+                setIsRequestAccepted(false);
+            }
+        } catch (error) {
+            console.error('Error denying friend request:', error);
+        }
+    };
+
+    const handleAddFriend = async (senderId: string, receiverId: string) => {
+        try {
+            const response = await fetch(`${serverUrl}/friends`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    senderId: senderId,
+                    receiverId: receiverId,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('error adding friend');
+            }
+            const data = await response.json();
+            console.log(data);
+        } catch (error) {
+            console.error('Error denying friend request:', error);
+        }
+    }
+
     return (
         <div style={friendRequestStyle.mainContainer}>
             <Image src={bg} roundedCircle style={friendRequestStyle.image} />
@@ -18,8 +68,24 @@ function FriendRequest({ email, name }: FriendRequestProps) {
                 <h4 style={friendRequestStyle.text}>{email}</h4>
             </div>
             <div style={friendRequestStyle.buttonContainer}>
-                <img style={friendRequestStyle.button} src={acceptIcon} alt="" />
-                <img style={friendRequestStyle.button} src={denyIcon} alt="" />
+                <img
+                    style={friendRequestStyle.button}
+                    src={acceptIcon}
+                    onClick={() => {
+                        setIsRequestAccepted(true);
+                        handleRequest();
+                    }}
+                    alt="Accept"
+                />
+                <img
+                    style={friendRequestStyle.button}
+                    src={denyIcon}
+                    onClick={() => {
+                        setIsRequestAccepted(false);
+                        handleRequest();
+                    }}
+                    alt="Deny"
+                />
             </div>
         </div>
     )

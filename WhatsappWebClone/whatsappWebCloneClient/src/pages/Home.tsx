@@ -13,7 +13,7 @@ function Home() {
     <div style={appStyle.mainContainer}>
       <div style={appStyle.subContainer}>
         <Toolbar userData={userData} />
-        <ChatsContainer />
+        <ChatsContainer userData={userData} />
       </div>
       <ChatBox />
     </div>

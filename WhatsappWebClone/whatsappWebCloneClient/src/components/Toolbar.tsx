@@ -43,6 +43,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ userData }) => {
     };
 
     const handleAddFriend = async () => {
+        if (addFriendText === '' || addFriendText === userData.email) return;
         try {
             const response = await fetch(`${serverUrl}/friendRequests`, {
                 method: 'POST',

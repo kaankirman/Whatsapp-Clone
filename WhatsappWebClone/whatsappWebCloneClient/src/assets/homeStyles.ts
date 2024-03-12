@@ -209,6 +209,7 @@ export const friendRequestStyle: FriendRequestStyles = {
   },
   button: {
     padding: "2px",
+    cursor: "pointer",
   },
 };
 

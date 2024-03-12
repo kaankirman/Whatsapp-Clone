@@ -4,20 +4,20 @@ import { accentColor, frameColor, chatStyle } from '../assets/homeStyles';
 interface ChatProps {
     image: string;
     name: string;
-    message: string;
+    status: string;
     time: string;
     onSelect: () => void;
     isSelected: boolean;
 }
 
-function Chat({ image, name, message, time, onSelect, isSelected }: ChatProps) {
+function Chat({ image, name, status, time, onSelect, isSelected }: ChatProps) {
     return (
         <div onClick={onSelect} style={{ ...chatStyle.mainContainer, background: isSelected ? accentColor : frameColor }}>
             <div style={chatStyle.userContainer}>
                 <Image src={image} roundedCircle style={chatStyle.userImage} />
                 <div style={chatStyle.userTextContainer}>
                     <h3 style={chatStyle.userText}>{name}</h3>
-                    <p style={chatStyle.userText}>{message}</p>
+                    <p style={chatStyle.userText}>{status}</p>
                 </div>
             </div>
             <p style={chatStyle.userText}>{time}</p>
