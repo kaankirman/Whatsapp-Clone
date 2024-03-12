@@ -57,6 +57,22 @@ app.patch('/users/:email', upload.none(), async (req, res) => {
     }
 });
 
+app.post('/friendRequests', async (req, res) => {
+    const { senderId, receiverId } = req.body;
+  
+    try {
+      const result = await pool.query(
+        'INSERT INTO friend_requests (sender_id, receiver_id, status) VALUES ($1, $2, $3) RETURNING *',
+        [senderId, receiverId, 'pending']
+      );
+  
+      res.json(result.rows[0]);
+    } catch (error) {
+      console.error('Error adding friend request:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  });
+
 /* //get existing files
 app.get('/files/:email', async (req, res) => {
     const { email } = req.params;

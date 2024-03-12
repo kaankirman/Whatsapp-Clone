@@ -21,11 +21,13 @@ const Toolbar: React.FC<ToolbarProps> = ({ userData }) => {
     const [isFirendListOpen, setIsFriendListOpen] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [addFriendText, setAddFriendText] = useState<string>('');
+    const serverUrl = import.meta.env.VITE_BASE_URL;
 
     const toggleMenu = () => {
         setIsOpen(!isOpen);
         setIsFriendListOpen(false);
     };
+    
     const toggleFriendList = () => {
         setIsFriendListOpen(!isFirendListOpen);
         setIsOpen(false);
@@ -39,6 +41,32 @@ const Toolbar: React.FC<ToolbarProps> = ({ userData }) => {
         setIsModalOpen(false);
     };
 
+    const handleAddFriend = async () => {
+        try {
+          const backendUrl = serverUrl;
+      
+          const response = await fetch(`${backendUrl}/friendRequests`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              senderId: userData.email,
+              receiverId: addFriendText,
+            }),
+          });
+      
+          if (!response.ok) {
+            throw new Error('Failed to add friend request');
+          }
+      
+          // Add any additional logic or state updates you need after successfully sending the friend request
+        } catch (error) {
+          console.error('Error adding friend request:', error);
+          // Handle error appropriately
+        }
+      };
+
     return (
         <div style={toolbarStyle.mainContainer}>
             <ProfileModal isOpen={isModalOpen} userData={userData} onClose={handleCloseModal} />
@@ -50,7 +78,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ userData }) => {
                         <ul style={toolbarStyle.friendList}>
                             <div style={toolbarStyle.firendListSearchContainer}>
                                 <li style={toolbarStyle.friendListItem} > <input style={toolbarStyle.friendSearchInput} placeholder="Enter your friend's email" type="text" onChange={(e) => setAddFriendText(e.target.value)} /> </li>
-                                <img src={addIcon} style={toolbarStyle.addIcon} alt="" />
+                                <img src={addIcon} style={toolbarStyle.addIcon} onClick={handleAddFriend} alt="" />
                             </div>
                             {/* insert friend request template */}
                             <div style={toolbarStyle.friendListPendingContainer}>
