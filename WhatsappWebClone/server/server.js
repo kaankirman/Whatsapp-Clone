@@ -58,20 +58,36 @@ app.patch('/users/:email', upload.none(), async (req, res) => {
 });
 
 app.post('/friendRequests', async (req, res) => {
-    const { senderId, receiverId } = req.body;
-  
+    const { senderId, receiverId, senderName } = req.body;
+
     try {
-      const result = await pool.query(
-        'INSERT INTO friend_requests (sender_id, receiver_id, status) VALUES ($1, $2, $3) RETURNING *',
-        [senderId, receiverId, 'pending']
-      );
-  
-      res.json(result.rows[0]);
+        const result = await pool.query(
+            'INSERT INTO friend_requests (sender_id, receiver_id, status, sender_name) VALUES ($1, $2, $3, $4) RETURNING *',
+            [senderId, receiverId, 'pending', senderName]
+        );
+
+        res.json(result.rows[0]);
     } catch (error) {
-      console.error('Error adding friend request:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
+        console.error('Error adding friend request:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
-  });
+});
+
+app.get('/friendRequests/:receiverId', async (req, res) => {
+    const { receiverId } = req.params;
+
+    try {
+        const result = await pool.query(
+            'SELECT * FROM friend_requests WHERE receiver_id = $1 AND status = $2',
+            [receiverId, 'pending']
+        );
+
+        res.json(result.rows);
+    } catch (error) {
+        console.error('Error retrieving friend requests:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
 
 /* //get existing files
 app.get('/files/:email', async (req, res) => {

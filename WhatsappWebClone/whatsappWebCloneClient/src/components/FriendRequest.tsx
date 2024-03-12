@@ -6,6 +6,7 @@ import { friendRequestStyle } from "../assets/homeStyles";
 interface FriendRequestProps {
     email: string;
     name: string;
+    requestId:number;
 }
 
 function FriendRequest({ email, name }: FriendRequestProps) {
