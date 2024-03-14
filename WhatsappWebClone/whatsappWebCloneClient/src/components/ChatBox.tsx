@@ -3,8 +3,13 @@ import { Image } from 'react-bootstrap';
 import { chatBoxStyle } from '../assets/homeStyles';
 import { useState } from 'react';
 import sendIcon from '../assets/media/sendIcon.png';
+import { SelectedConversation } from '../pages/Home';
 
-function ChatBox() {
+interface ChatBoxProps {
+    selectedConversation: SelectedConversation | null;
+}
+
+const ChatBox: React.FC<ChatBoxProps> = ({selectedConversation}) => {
     const [message, setMessage] = useState('');
     function sendMessage() {
         // Send the message to the server
@@ -13,7 +18,7 @@ function ChatBox() {
         <div style={chatBoxStyle.mainContainer}>
             <div style={chatBoxStyle.userContainer}>
                 <Image src={profilePlaceholder} roundedCircle style={chatBoxStyle.userIcon} />
-                <h3 style={chatBoxStyle.userName}>Jane Doe</h3>
+                <h3 style={chatBoxStyle.userName}>{selectedConversation?.name}</h3>
             </div>
             <div style={chatBoxStyle.chatContent}>
                 {/* Content of the chat box */}
@@ -24,7 +29,7 @@ function ChatBox() {
                         type="text"
                         value={message}
                         onChange={(e) => setMessage(e.target.value)} />
-                    {message ?(<img src={sendIcon} style={chatBoxStyle.sendIcon} onClick={sendMessage} alt="" />):null}
+                    {message ? (<img src={sendIcon} style={chatBoxStyle.sendIcon} onClick={sendMessage} alt="" />) : null}
                 </div>
             </div>
         </div>

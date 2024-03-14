@@ -1,18 +1,30 @@
 import { Image } from 'react-bootstrap';
 import { accentColor, frameColor, chatStyle } from '../assets/homeStyles';
+import { SelectedConversation } from '../pages/Home';
 
 interface ChatProps {
     image: string;
+    email: string;
     name: string;
     status: string;
+    conversationId: number; // Corrected the type to lowercase 'number'
     time: string;
-    onSelect: () => void;
+    onSelect: (selectedConversation:SelectedConversation) => void; // Updated onSelect function to accept a conversationId
     isSelected: boolean;
 }
 
-function Chat({ image, name, status, time, onSelect, isSelected }: ChatProps) {
+function Chat({ image, name, status, time, conversationId, onSelect, isSelected }: ChatProps) {
+
+    const selectedConversation = {
+        name: name,
+        conversationId: conversationId,
+    }
+    const handleClick = () => {
+        onSelect(selectedConversation); // Pass conversationId to the onSelect function
+    };
+
     return (
-        <div onClick={onSelect} style={{ ...chatStyle.mainContainer, background: isSelected ? accentColor : frameColor }}>
+        <div onClick={handleClick} style={{ ...chatStyle.mainContainer, background: isSelected ? accentColor : frameColor }}>
             <div style={chatStyle.userContainer}>
                 <Image src={image} roundedCircle style={chatStyle.userImage} />
                 <div style={chatStyle.userTextContainer}>

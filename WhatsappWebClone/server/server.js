@@ -113,11 +113,16 @@ app.delete('/friendRequests/:request_id', async (req, res) => {
 //accept friend request
 app.post('/friends', async (req, res) => {
     const { senderId, receiverId } = req.body;
+    let conversationId = null;
 
     try {
+        const conversationResult = await pool.query('INSERT INTO conversations (title, conversation_type) VALUES ($1, $2) RETURNING *', ["none", "private"]);
+        console.log(conversationResult.rows[0]);
+        conversationId = conversationResult.rows[0].conversation_id;
+
         const result = await pool.query(
-            'INSERT INTO friends (sender_id, receiver_id, status) VALUES ($1, $2, $3) RETURNING *',
-            [senderId, receiverId, 'accepted']
+            'INSERT INTO friends (sender_id, receiver_id, status, conversation_id) VALUES ($1, $2, $3, $4) RETURNING *',
+            [senderId, receiverId, 'accepted', conversationId]
         );
 
         res.json(result.rows[0]);
@@ -127,21 +132,38 @@ app.post('/friends', async (req, res) => {
     }
 });
 
+
 //get friends
 app.get('/friends/:userId', async (req, res) => {
     const { userId } = req.params;
 
     try {
-        const emailResult = await pool.query(
-            'SELECT sender_id AS friend_email FROM friends WHERE receiver_id = $1 UNION SELECT receiver_id AS friend_email FROM friends WHERE sender_id = $1;',
+        // Step 1: Fetch friend emails and conversation IDs
+        const friendDataResult = await pool.query(
+            `SELECT f.sender_id AS friend_email, f.conversation_id 
+             FROM friends f 
+             WHERE f.receiver_id = $1 
+             UNION 
+             SELECT f.receiver_id AS friend_email, f.conversation_id 
+             FROM friends f 
+             WHERE f.sender_id = $1;`,
             [userId]
         );
-        const friendEmails = emailResult.rows.map(row => row.friend_email);
+
+        const friendData = friendDataResult.rows;
 
         // Step 2: Fetch user data for each friend
-        const userDataPromises = friendEmails.map(async (friendEmail) => {
-            const userDataResult = await pool.query('SELECT email, name, status FROM users WHERE email = $1', [friendEmail]);
-            return userDataResult.rows[0];
+        const userDataPromises = friendData.map(async (friend) => {
+            const userDataResult = await pool.query(
+                'SELECT email, name, status FROM users WHERE email = $1',
+                [friend.friend_email]
+            );
+            return {
+                email: userDataResult.rows[0].email,
+                name: userDataResult.rows[0].name,
+                status: userDataResult.rows[0].status,
+                conversationId: friend.conversation_id
+            };
         });
 
         const userData = await Promise.all(userDataPromises);

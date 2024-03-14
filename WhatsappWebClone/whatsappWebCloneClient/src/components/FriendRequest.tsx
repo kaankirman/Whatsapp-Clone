@@ -12,7 +12,7 @@ interface FriendRequestProps {
 
 function FriendRequest({ email, name, requestId }: FriendRequestProps) {
     const serverUrl = import.meta.env.VITE_BASE_URL;
-    const [isRequestAccepted, setIsRequestAccepted] = useState(false);
+    const [isRequestAccepted, setIsRequestAccepted] = useState(true);
 
 
     const handleRequest = async () => {

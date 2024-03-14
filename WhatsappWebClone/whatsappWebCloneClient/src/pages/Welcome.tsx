@@ -53,7 +53,7 @@ const Welcome = () => {
             });
             const data = await response.json();
             if (data.accessToken) {
-                navigate('/home');
+                navigate('/home', { state: { data } });
             }
         }
     };

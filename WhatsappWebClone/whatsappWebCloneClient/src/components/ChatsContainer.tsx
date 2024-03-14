@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Chat from './Chat';
 import profilePlaceholder from '../assets/media/profilePlaceholder.png';
 import { chatsContainerStyle } from '../assets/homeStyles';
+import { SelectedConversation } from '../pages/Home';
 
 interface ChatsContainerProps {
     userData: {
@@ -11,22 +12,21 @@ interface ChatsContainerProps {
         status: string;
         email: string;
     };
-}
-
+    handleChatSelect: (selectedConversation: SelectedConversation) => void;
+    selectedConversation: SelectedConversation | null;
+};
 interface Friend {
+    email: string;
     name: string;
     status: string;
+    conversationId: number;
 }
 
-const ChatsContainer: React.FC<ChatsContainerProps> = ({ userData }) => {
+const ChatsContainer: React.FC<ChatsContainerProps> = ({ userData, handleChatSelect,selectedConversation }) => {
     const serverUrl = import.meta.env.VITE_BASE_URL;
     const [chats, setChats] = useState<Array<Friend>>([]);
-    const [selectedChatIndex, setSelectedChatIndex] = useState<number | null>(null); // Specify the type as number or null
     const image = profilePlaceholder;
 
-    const handleChatSelect = (index: number | null) => {
-        setSelectedChatIndex(index);
-    };
 
     useEffect(() => {
         const fetchFriends = async () => {
@@ -37,6 +37,7 @@ const ChatsContainer: React.FC<ChatsContainerProps> = ({ userData }) => {
                 }
                 const data = await response.json();
                 setChats(data); // Assuming data is an array of friend details
+                console.log('Friends:', data);
             } catch (error) {
                 console.error('Error fetching friends:', error);
             }
@@ -45,18 +46,40 @@ const ChatsContainer: React.FC<ChatsContainerProps> = ({ userData }) => {
         fetchFriends();
     }, [serverUrl, userData.email]);
 
+    // Effect to fetch messages when selectedConversationId changes
+    useEffect(() => {
+        const fetchMessages = async () => {
+            if (selectedConversation !== null) {
+                try {
+                    const response = await fetch(`${serverUrl}/messages/${selectedConversation.conversationId}`);
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch messages.');
+                    }
+                    const data = await response.json();
+                    // Handle fetched messages
+                    console.log('Messages:', data);
+                } catch (error) {
+                    console.error('Error fetching messages:', error);
+                }
+            }
+        };
+
+        fetchMessages();
+    }, [serverUrl, selectedConversation?.conversationId]);
 
     return (
         <div style={chatsContainerStyle.mainContainer}>
             {chats.map((friend, index) => (
                 <Chat
                     key={index}
-                    image={image} // Update this with the actual friend's image
-                    name={friend.name} // Update this with the actual friend's name
-                    status={friend.status} // Update this with the actual friend's status
-                    time="" // You may want to modify this based on your requirements
-                    onSelect={() => handleChatSelect(index)}
-                    isSelected={index === selectedChatIndex}
+                    image={image}
+                    email={friend.email}
+                    name={friend.name}
+                    status={friend.status}
+                    conversationId={friend.conversationId}
+                    time=""
+                    onSelect={handleChatSelect}
+                    isSelected={friend.conversationId === selectedConversation?.conversationId}
                 />
             ))}
         </div>
