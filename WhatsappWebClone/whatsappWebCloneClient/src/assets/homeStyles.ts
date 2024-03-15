@@ -303,7 +303,11 @@ export const chatBoxStyle: ChatBoxStyles = {
     width: "100%",
   },
   chatContent: {
+    ...defaultStyle.flexColumn,
+    overflow: "auto",
+    maxHeight: "100%",
     background: accentColor,
+    scrollbarWidth: "none",
     flex: 1,
     justifyContent: "flex-between",
   },

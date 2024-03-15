@@ -1,20 +1,9 @@
-// ChatsContainer.jsx
-
 import { useEffect, useState } from 'react';
 import Chat from './Chat';
 import profilePlaceholder from '../assets/media/profilePlaceholder.png';
 import { chatsContainerStyle } from '../assets/homeStyles';
-import { SelectedConversation } from '../pages/Home';
+import { useSelectedConversation } from '../components/SelectedConversationContext';
 
-interface ChatsContainerProps {
-    userData: {
-        name: string;
-        status: string;
-        email: string;
-    };
-    handleChatSelect: (selectedConversation: SelectedConversation) => void;
-    selectedConversation: SelectedConversation | null;
-};
 interface Friend {
     email: string;
     name: string;
@@ -22,11 +11,11 @@ interface Friend {
     conversationId: number;
 }
 
-const ChatsContainer: React.FC<ChatsContainerProps> = ({ userData, handleChatSelect,selectedConversation }) => {
+const ChatsContainer: React.FC<{ userData: any }> = ({ userData }) => {
     const serverUrl = import.meta.env.VITE_BASE_URL;
     const [chats, setChats] = useState<Array<Friend>>([]);
     const image = profilePlaceholder;
-
+    const { selectedConversation } = useSelectedConversation();
 
     useEffect(() => {
         const fetchFriends = async () => {
@@ -46,7 +35,6 @@ const ChatsContainer: React.FC<ChatsContainerProps> = ({ userData, handleChatSel
         fetchFriends();
     }, [serverUrl, userData.email]);
 
-    // Effect to fetch messages when selectedConversationId changes
     useEffect(() => {
         const fetchMessages = async () => {
             if (selectedConversation !== null) {
@@ -69,17 +57,15 @@ const ChatsContainer: React.FC<ChatsContainerProps> = ({ userData, handleChatSel
 
     return (
         <div style={chatsContainerStyle.mainContainer}>
-            {chats.map((friend, index) => (
+            {chats.map((friend) => (
                 <Chat
-                    key={index}
+                    key={friend.conversationId}
                     image={image}
                     email={friend.email}
                     name={friend.name}
                     status={friend.status}
                     conversationId={friend.conversationId}
                     time=""
-                    onSelect={handleChatSelect}
-                    isSelected={friend.conversationId === selectedConversation?.conversationId}
                 />
             ))}
         </div>

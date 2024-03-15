@@ -1,4 +1,6 @@
-const PORT = process.env.PORT || 8000;
+require('dotenv').config();
+const PORT = process.env.PORT;
+const SOCKET_PORT = process.env.SOCKET_PORT;
 const express = require('express');
 const cors = require('cors');
 const app = express();
@@ -8,9 +10,25 @@ const bcrypt = require('bcrypt');
 const token = require('jsonwebtoken');
 const multer = require('multer');
 const upload = multer();
+const io = require('socket.io')(SOCKET_PORT, {
+    cors: {
+        origin: [`http://localhost:5173`],
+    }
+
+})
 
 app.use(cors());
 app.use(express.json());
+
+io.on('connection', (socket) => {
+    console.log(socket.id);
+    socket.on('send-message', (message, conversationId) => {
+        socket.to(conversationId).emit('receive-message', message, conversationId);
+    })
+    socket.on('join-conversation', (conversationId) => {
+        socket.join(conversationId);
+    })
+});
 
 //signup
 app.post('/signup', async (req, res) => {
