@@ -16,7 +16,7 @@ function Home() {
           <Toolbar userData={userData} />
           <ChatsContainer userData={userData} />
         </div>
-        <ChatBox />
+        <ChatBox userData={userData} />
       </div>
     </SelectedConversationProvider>
   )

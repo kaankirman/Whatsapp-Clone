@@ -6,11 +6,12 @@ import { io } from 'socket.io-client';
 import sendIcon from '../assets/media/sendIcon.png';
 import { useSelectedConversation } from '../components/SelectedConversationContext';
 
+const serverUrl = import.meta.env.VITE_BASE_URL;
 const socketUrl = import.meta.env.VITE_SOCKET_URL;
 const socket = io(socketUrl);
 let selectedConversationId: number | null;
 
-const ChatBox: React.FC = () => {
+const ChatBox: React.FC<{ userData: any }> = ({ userData }) => {
     const [message, setMessage] = useState('');
     const { selectedConversation } = useSelectedConversation();
 
@@ -22,7 +23,7 @@ const ChatBox: React.FC = () => {
     useEffect(() => {
         const handleReceiveMessage = (message: string, conversationId: any) => {
             if (selectedConversationId === conversationId)
-                displayMessage(message);
+                displayIncomingMessage(message);
         };
         socket.on('receive-message', handleReceiveMessage);
         return () => {
@@ -30,17 +31,17 @@ const ChatBox: React.FC = () => {
         };
     }, []);
 
-    const displayMessage = (message: string) => {
+    const displayIncomingMessage = (message: string) => {
         const chatContent = document.getElementById('chatContent');
         if (chatContent) {
             const messageDiv = document.createElement('div');
             messageDiv.textContent = message;
-            messageDiv.style.cssText = 'background-color: #dcf8c6; font-color: white; padding: 10px; margin: 10px; border: none; border-radius: 10px; align-self: flex-start;box-shadow: 0 0 10px 0px black; width: fit-content;';
+            messageDiv.style.cssText = 'background-color:white; font-color: white; padding: 10px; margin: 10px; border: none; border-radius: 10px; align-self: flex-start;box-shadow: 0 0 10px 0px black; width: fit-content;';
             chatContent.appendChild(messageDiv);
         }
     };
 
-    const sendMessage = () => {
+    const displayOutgoingMessage = () => {
         if (message.trim() === '') return; // Don't send empty messages
 
         // Append message content directly to the chat content div
@@ -48,14 +49,41 @@ const ChatBox: React.FC = () => {
         if (chatContent) {
             const messageDiv = document.createElement('div');
             messageDiv.textContent = message;
-            messageDiv.style.cssText = 'background-color: #dcf8c6; padding: 10px; margin: 10px; border-radius: 10px; box-shadow: 0 0 10px 0px black; align-self: flex-end; width: fit-content;';
+            messageDiv.style.cssText = 'background-color: #1F8AFF; padding: 10px; margin: 10px; border-radius: 10px; box-shadow: 0 0 10px 0px black; align-self: flex-end; width: fit-content;';
             chatContent.appendChild(messageDiv);
-            socket.emit('send-message', message, selectedConversation!.conversationId);
-            console.log(selectedConversation!.conversationId);
         }
+    };
 
+    const sendMessage = () => {
+        displayOutgoingMessage();
+        socket.emit('send-message', message, selectedConversationId);
+        handleSendMessage();
         setMessage(''); // Clear the input field
     };
+
+    const handleSendMessage = async () => {
+        try {
+            const response = await fetch(`${serverUrl}/messages`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    senderId: userData.email,
+                    conversationId: selectedConversationId,
+                    message: message,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('error adding friend');
+            }
+            const data = await response.json();
+            console.log(data);
+        } catch (error) {
+            console.error('Error denying friend request:', error);
+        }
+    }
 
     return (
         <div style={chatBoxStyle.mainContainer}>

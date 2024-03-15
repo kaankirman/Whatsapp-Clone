@@ -20,6 +20,7 @@ const io = require('socket.io')(SOCKET_PORT, {
 app.use(cors());
 app.use(express.json());
 
+//socket.io
 io.on('connection', (socket) => {
     console.log(socket.id);
     socket.on('send-message', (message, conversationId) => {
@@ -189,6 +190,21 @@ app.get('/friends/:userId', async (req, res) => {
         res.json(userData);
     } catch (error) {
         console.error('Error retrieving friend data:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+//send message
+app.post('/messages', async (req, res) => {
+    const { senderId, conversationId, message } = req.body;
+    try {
+        const result = await pool.query(
+            'INSERT INTO messages (sender_id, conversation_id, message_text) VALUES ($1, $2, $3) RETURNING *',
+            [senderId, conversationId, message]
+        );
+        res.json(result.rows[0]);
+    } catch (error) {
+        console.error('Error sending message:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
