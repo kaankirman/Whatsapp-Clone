@@ -10,6 +10,7 @@ const bcrypt = require('bcrypt');
 const token = require('jsonwebtoken');
 const multer = require('multer');
 const upload = multer();
+
 const io = require('socket.io')(SOCKET_PORT, {
     cors: {
         origin: [`http://localhost:5173`],
@@ -208,6 +209,22 @@ app.post('/messages', async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+
+//get messages
+app.get('/messages/:conversationId', async (req, res) => {
+    const { conversationId } = req.params;
+    try {
+        const result = await pool.query(
+            'SELECT sender_id, message_text FROM messages WHERE conversation_id = $1',
+            [conversationId]
+        );
+        res.json(result.rows);
+    } catch (error) {
+        console.error('Error retrieving messages:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
 
 
 /* //get existing files

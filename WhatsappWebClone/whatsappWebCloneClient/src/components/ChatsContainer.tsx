@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import Chat from './Chat';
 import profilePlaceholder from '../assets/media/profilePlaceholder.png';
 import { chatsContainerStyle } from '../assets/homeStyles';
-import { useSelectedConversation } from '../components/SelectedConversationContext';
 
 interface Friend {
     email: string;
@@ -15,7 +14,6 @@ const ChatsContainer: React.FC<{ userData: any }> = ({ userData }) => {
     const serverUrl = import.meta.env.VITE_BASE_URL;
     const [chats, setChats] = useState<Array<Friend>>([]);
     const image = profilePlaceholder;
-    const { selectedConversation } = useSelectedConversation();
 
     useEffect(() => {
         const fetchFriends = async () => {

@@ -22,8 +22,12 @@ const ChatBox: React.FC<{ userData: any }> = ({ userData }) => {
 
     useEffect(() => {
         const handleReceiveMessage = (message: string, conversationId: any) => {
-            if (selectedConversationId === conversationId)
+            if (selectedConversationId === conversationId) {
                 displayIncomingMessage(message);
+            }
+            else {
+                console.log('Message from another conversation:', message);
+            }
         };
         socket.on('receive-message', handleReceiveMessage);
         return () => {
