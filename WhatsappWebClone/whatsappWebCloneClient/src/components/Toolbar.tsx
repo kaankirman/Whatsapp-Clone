@@ -1,4 +1,4 @@
-import { Image } from "react-bootstrap";
+import Image from "react-bootstrap/Image";
 import profilePlaceholder from "../assets/media/profilePlaceholder.png";
 import menuIcon from "../assets/media/menuIcon.png";
 import addIcon from "../assets/media/addIcon.png";

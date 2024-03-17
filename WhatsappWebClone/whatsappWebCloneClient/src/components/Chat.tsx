@@ -1,4 +1,4 @@
-import { Image } from 'react-bootstrap';
+import Image from 'react-bootstrap/Image';
 import { accentColor, frameColor, chatStyle } from '../assets/homeStyles';
 import { useSelectedConversation } from './Contexts/SelectedConversationContext';
 import { useContext, useEffect } from 'react';

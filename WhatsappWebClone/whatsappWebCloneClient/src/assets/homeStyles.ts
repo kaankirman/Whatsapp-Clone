@@ -100,6 +100,7 @@ export const toolbarStyle: ToolbarStyles = {
   profileIcon: {
     width: "50px",
     height: "50px",
+    borderRadius: "50%",
   },
   icon: {
     width: "30px",
@@ -244,6 +245,7 @@ export const chatStyle: ChatStyles = {
     alignItems: "center",
     margin: "0.1vh",
     padding: "1vh",
+    borderBottom: `0.1px solid ${accentColor}`,
   },
   userContainer: {
     ...defaultStyle.flexRow,
@@ -260,6 +262,7 @@ export const chatStyle: ChatStyles = {
   userImage: {
     width: "50px",
     height: "50px",
+    borderRadius: "50%",
   },
 };
 
@@ -323,6 +326,7 @@ export const chatBoxStyle: ChatBoxStyles = {
   userIcon: {
     width: "50px",
     height: "50px",
+    borderRadius: "50%",
   },
   userName: {
     margin: "1vh",
@@ -339,19 +343,30 @@ export const chatBoxStyle: ChatBoxStyles = {
 type AppStyles = {
   mainContainer: React.CSSProperties;
   subContainer: React.CSSProperties;
+  placeHolderDiv: React.CSSProperties;
 };
 
 export const appStyle: AppStyles = {
   mainContainer: {
     ...defaultStyle.flexRow,
     height: "96vh",
-    margin: "2vh 5vh 2vh 5vh",
+    width: "60%",
+    margin: "2vh 5vh 2vh 20%",
     boxShadow: "0 0 50px 0px black",
     background: frameColor,
   },
   subContainer: {
     ...defaultStyle.flexColumn,
     width: "30%",
+  },
+  placeHolderDiv: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
+    color: frameColor,
+    background:accentColor,
+    fontSize: "2em",
   },
 };
 

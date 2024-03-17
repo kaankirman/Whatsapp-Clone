@@ -1,6 +1,6 @@
 import profilePlaceholder from '../assets/media/profilePlaceholder.png';
 import { useState, useEffect, useContext } from 'react';
-import { Image } from 'react-bootstrap';
+import Image from 'react-bootstrap/Image';
 import { chatBoxStyle } from '../assets/homeStyles';
 import { io } from 'socket.io-client';
 import sendIcon from '../assets/media/sendIcon.png';
@@ -36,33 +36,36 @@ const ChatBox: React.FC<ChatBoxProps> = ({ userData, friendCount }) => {
     const [isLoaded, setIsLoaded] = useState(false)
     const { selectedConversation } = useSelectedConversation();
     const { messages, updateMessages } = useContext(MessageContext);
+    const [currentConversation, setCurrentConversation] = useState(selectedConversation);
 
     useEffect(() => {
-        clearChatContent();
-        selectedConversationId = selectedConversation?.conversationId ?? null;
-        socket.emit('join-conversation', selectedConversation?.conversationId);
-        const messagesArray = messages[selectedConversationId!] || [];
-        messagesArray.forEach(messageObj => {
-            const { message_text } = messageObj;
-            console.log(userData.email);
-            if (messageObj.sender_id === userData.email) {
-                displayOutgoingMessage(message_text);
-            }
-            else {
-                displayIncomingMessage(message_text);
-            }
-        });
+        if (currentConversation?.conversationId === selectedConversation?.conversationId) {
+            return;
+        }
+        else {
+            clearChatContent();
+            selectedConversationId = selectedConversation?.conversationId ?? null;
+            socket.emit('join-conversation', selectedConversation?.conversationId);
+            const messagesArray = messages[selectedConversationId!] || [];
+            messagesArray.forEach(messageObj => {
+                const { message_text } = messageObj;
+                if (messageObj.sender_id === userData.email) {
+                    displayOutgoingMessage(message_text);
+                }
+                else {
+                    displayIncomingMessage(message_text);
+                }
+            });
+            setCurrentConversation(selectedConversation);
+        }
     }, [selectedConversation]);
 
     useEffect(() => {
         const handleReceiveMessage = (message: string, conversationId: number) => {
-            if (selectedConversationId !== conversationId) {
-                console.log('Message from another conversation:', message);
-            } else {
+            if (selectedConversationId === conversationId) {
                 displayIncomingMessage(message);
             }
             handleAddMessagesToState(conversationId, { sender_id: "other", message_text: message });
-            console.log(messages);
         };
 
         socket.on('receive-message', handleReceiveMessage);
@@ -73,15 +76,11 @@ const ChatBox: React.FC<ChatBoxProps> = ({ userData, friendCount }) => {
     }, []);
 
     useEffect(() => {
-        console.log('Friend count:', friendCount);
-        console.log(Object.keys(messages).length);
         if (friendCount === Object.keys(messages).length) {
             Object.keys(messages).forEach((conversationId) => {
                 socket.emit('join-conversation', Number(conversationId));
-                console.log('Joined conversation:', conversationId);
             });
             allMessages = messages
-            console.log(allMessages);
             setIsLoaded(true)
         }
     }, [messages]);
@@ -115,10 +114,8 @@ const ChatBox: React.FC<ChatBoxProps> = ({ userData, friendCount }) => {
             });
 
             if (!response.ok) {
-                throw new Error('error adding friend');
+                throw new Error('error sending message');
             }
-            const data = await response.json();
-            console.log(data);
         } catch (error) {
             console.error('Error posting sent message:', error);
         }
@@ -136,9 +133,8 @@ const ChatBox: React.FC<ChatBoxProps> = ({ userData, friendCount }) => {
     };
 
     const displayOutgoingMessage = (message: string) => {
-        if (message.trim() === '') return; // Don't send empty messages
+        if (message.trim() === '') return;
 
-        // Append message content directly to the chat content div
         const chatContent = document.getElementById('chatContent');
         if (chatContent) {
             const messageDiv = document.createElement('div');
@@ -152,7 +148,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ userData, friendCount }) => {
     const clearChatContent = () => {
         const chatContent = document.getElementById('chatContent');
         if (chatContent) {
-            chatContent.innerHTML = ''; // Remove all child elements
+            chatContent.innerHTML = '';
         }
     };
 

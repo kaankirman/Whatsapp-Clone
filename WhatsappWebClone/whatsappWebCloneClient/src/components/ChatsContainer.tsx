@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import Chat from './Chat';
-import profilePlaceholder from '../assets/media/profilePlaceholder.png';
+import profilePlaceholder from '../assets/media/bg.jpg';
 import { chatsContainerStyle } from '../assets/homeStyles';
 
 interface Friend {
@@ -29,7 +29,6 @@ const ChatsContainer: React.FC<ChatsContainerProps> = ({ userData, setFriendCoun
                 }
                 const data = await response.json();
                 setChats(data);
-                console.log('Friends:', data);
                 setFriendCount(data.length);
             } catch (error) {
                 console.error('Error fetching friends:', error);
