@@ -1,4 +1,5 @@
 import React from "react";
+import chatContentBg from "./media/chatContentBg.png";
 
 export const frameColor = "#2b2b2b";
 export const accentColor = "#636363";
@@ -276,6 +277,7 @@ type ChatBoxStyles = {
   userName: React.CSSProperties;
   sendIcon: React.CSSProperties;
   inputBorder: React.CSSProperties;
+  placeHolderText: React.CSSProperties;
 };
 
 export const chatBoxStyle: ChatBoxStyles = {
@@ -309,8 +311,9 @@ export const chatBoxStyle: ChatBoxStyles = {
     ...defaultStyle.flexColumn,
     overflow: "auto",
     maxHeight: "100%",
-    background: accentColor,
     scrollbarWidth: "none",
+    backgroundImage:`url(${chatContentBg})`,
+    backgroundSize:"cover",
     flex: 1,
     justifyContent: "flex-between",
   },
@@ -338,6 +341,15 @@ export const chatBoxStyle: ChatBoxStyles = {
     width: "22px",
     height: "22px",
   },
+  placeHolderText: {
+    position: "absolute",
+    top: "50%",
+    margin:"0",
+    padding:"0",
+    color:"white",
+    alignSelf: "center",
+    fontSize: "1.5em",
+  },
 };
 
 type AppStyles = {
@@ -354,6 +366,7 @@ export const appStyle: AppStyles = {
     margin: "2vh 5vh 2vh 20%",
     boxShadow: "0 0 50px 0px black",
     background: frameColor,
+    fontFamily: "Arial, sans-serif",
   },
   subContainer: {
     ...defaultStyle.flexColumn,

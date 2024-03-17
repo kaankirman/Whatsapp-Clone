@@ -126,7 +126,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ userData, friendCount }) => {
         if (chatContent) {
             const messageDiv = document.createElement('div');
             messageDiv.textContent = message;
-            messageDiv.style.cssText = 'background-color:white; font-color: white; padding: 10px; margin: 10px; border: none; border-radius: 10px; align-self: flex-start;box-shadow: 0 0 10px 0px black; width: fit-content;';
+            messageDiv.style.cssText = 'background-color:#2b2b2b; color: white; padding: 10px; margin: 10px; border: none; border-radius:0 10px 10px 10px; align-self: flex-start;box-shadow: 0 0 10px 0px black; width: fit-content;';
             chatContent.appendChild(messageDiv);
             chatContent.scrollTop = chatContent.scrollHeight;
         }
@@ -139,7 +139,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ userData, friendCount }) => {
         if (chatContent) {
             const messageDiv = document.createElement('div');
             messageDiv.textContent = message;
-            messageDiv.style.cssText = 'background-color: #1F8AFF; padding: 10px; margin: 10px; border-radius: 10px; box-shadow: 0 0 10px 0px black; align-self: flex-end; width: fit-content;';
+            messageDiv.style.cssText = 'background-color: #636363; color:white; padding: 10px; margin: 10px; border-radius:10px 0 10px 10px; box-shadow: 0 0 10px 0px black; align-self: flex-end; width: fit-content;';
             chatContent.appendChild(messageDiv);
             chatContent.scrollTop = chatContent.scrollHeight;
         }
@@ -161,22 +161,23 @@ const ChatBox: React.FC<ChatBoxProps> = ({ userData, friendCount }) => {
     return (
         <>
             {isLoaded ? (<div style={chatBoxStyle.mainContainer}>
-                <div style={chatBoxStyle.userContainer}>
+                {selectedConversation ? (<div style={chatBoxStyle.userContainer}>
                     <Image src={profilePlaceholder} roundedCircle style={chatBoxStyle.userIcon} />
                     <h3 style={chatBoxStyle.userName}>{selectedConversation?.name}</h3>
-                </div>
+                </div>) : null}
                 <div id="chatContent" style={chatBoxStyle.chatContent}>
                     {/* Content of the chat box */}
+                    <p style={chatBoxStyle.placeHolderText}>Nothing to show</p>
                 </div>
                 <div style={{ ...chatBoxStyle.inputContainer }}>
-                    <div style={chatBoxStyle.inputBorder}>
+                    {selectedConversation ? (<div style={chatBoxStyle.inputBorder}>
                         <input style={chatBoxStyle.messageInput} placeholder="Search or start new chat"
                             type="text"
                             value={message}
                             onChange={(e) => setMessage(e.target.value)}
                             onKeyDown={handleKeyDown} />
                         {message ? (<img src={sendIcon} style={chatBoxStyle.sendIcon} onClick={sendMessage} alt="Send" />) : null}
-                    </div>
+                    </div>) : null}
                 </div>
             </div>) : null}
         </>

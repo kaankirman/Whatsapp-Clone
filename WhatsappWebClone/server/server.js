@@ -158,7 +158,6 @@ app.get('/friends/:userId', async (req, res) => {
     const { userId } = req.params;
 
     try {
-        // Step 1: Fetch friend emails and conversation IDs
         const friendDataResult = await pool.query(
             `SELECT f.sender_id AS friend_email, f.conversation_id 
              FROM friends f 
@@ -172,7 +171,6 @@ app.get('/friends/:userId', async (req, res) => {
 
         const friendData = friendDataResult.rows;
 
-        // Step 2: Fetch user data for each friend
         const userDataPromises = friendData.map(async (friend) => {
             const userDataResult = await pool.query(
                 'SELECT email, name, status FROM users WHERE email = $1',

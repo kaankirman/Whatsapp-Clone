@@ -4,21 +4,13 @@ import Toolbar from '../components/Toolbar';
 import ChatsContainer from '../components/ChatsContainer';
 import ChatBox from '../components/ChatBox';
 import { appStyle } from '../assets/homeStyles';
-import { SelectedConversationProvider, useSelectedConversation } from '../components/Contexts/SelectedConversationContext';
+import { SelectedConversationProvider } from '../components/Contexts/SelectedConversationContext';
 import { MessageProvider } from '../components/Contexts/MessageContext';
 
 function HomeLayout() {
   const location = useLocation();
   const userData = location.state.data;
-  const { selectedConversation } = useSelectedConversation();
   const [friendCount, setFriendCount] = useState(0);
-  const [chatBox, setChatBox] = useState(false);
-
-  useEffect(() => {
-    if (selectedConversation) {
-      setChatBox(true);
-    }
-  }, [selectedConversation]);
 
   return (
     <div style={appStyle.mainContainer}>
