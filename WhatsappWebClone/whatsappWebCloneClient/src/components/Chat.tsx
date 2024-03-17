@@ -1,9 +1,8 @@
 import { Image } from 'react-bootstrap';
 import { accentColor, frameColor, chatStyle } from '../assets/homeStyles';
-import { useSelectedConversation } from '../components/SelectedConversationContext';
-import { io } from 'socket.io-client';
+import { useSelectedConversation } from './Contexts/SelectedConversationContext';
 import { useContext, useEffect } from 'react';
-import { MessageContext } from './MessageContext';
+import { MessageContext } from './Contexts/MessageContext';
 interface ChatProps {
     image: string;
     email: string;
@@ -13,11 +12,16 @@ interface ChatProps {
     time: string;
 }
 
+interface Message {
+    sender_id: string;
+    message_text: string;
+    send_at: string;
+}
+
 function Chat({ image, name, status, time, conversationId }: ChatProps) {
     const { selectedConversation, setSelectedConversation } = useSelectedConversation();
     const { updateMessages } = useContext(MessageContext);
     const serverUrl = import.meta.env.VITE_BASE_URL;
-    const socket = io(import.meta.env.VITE_SOCKET_URL);
 
     const handleClick = () => {
         setSelectedConversation({ name, conversationId });
@@ -30,20 +34,19 @@ function Chat({ image, name, status, time, conversationId }: ChatProps) {
                 throw new Error('Failed to fetch messages.');
             }
             const data = await response.json();
-            updateMessages(conversationId, data);
+            const sortedData = data.sort((a: Message, b: Message) => {
+                const dateA = new Date(a.send_at).getTime();
+                const dateB = new Date(b.send_at).getTime();
+                return dateA - dateB;
+            });
+            updateMessages(conversationId, sortedData);
         } catch (error) {
             console.error('Error fetching messages:', error);
         }
     }
 
-    const joinConversation = () => {
-        socket.emit('join-conversation', conversationId);
-        console.log('Joined conversation:', conversationId);
-        fetchMesages();
-    };
-
     useEffect(() => {
-        joinConversation();
+        fetchMesages();
     }, []);
 
     return (

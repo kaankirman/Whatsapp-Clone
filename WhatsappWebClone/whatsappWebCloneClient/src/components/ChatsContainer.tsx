@@ -10,7 +10,12 @@ interface Friend {
     conversationId: number;
 }
 
-const ChatsContainer: React.FC<{ userData: any }> = ({ userData }) => {
+interface ChatsContainerProps {
+    userData: any;
+    setFriendCount: React.Dispatch<React.SetStateAction<number>>;
+}
+
+const ChatsContainer: React.FC<ChatsContainerProps> = ({ userData, setFriendCount }) => {
     const serverUrl = import.meta.env.VITE_BASE_URL;
     const [chats, setChats] = useState<Array<Friend>>([]);
     const image = profilePlaceholder;
@@ -25,6 +30,7 @@ const ChatsContainer: React.FC<{ userData: any }> = ({ userData }) => {
                 const data = await response.json();
                 setChats(data);
                 console.log('Friends:', data);
+                setFriendCount(data.length);
             } catch (error) {
                 console.error('Error fetching friends:', error);
             }

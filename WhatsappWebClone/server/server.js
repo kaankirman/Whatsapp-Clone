@@ -215,7 +215,7 @@ app.get('/messages/:conversationId', async (req, res) => {
     const { conversationId } = req.params;
     try {
         const result = await pool.query(
-            'SELECT sender_id, message_text FROM messages WHERE conversation_id = $1',
+            'SELECT sender_id, message_text, send_at FROM messages WHERE conversation_id = $1',
             [conversationId]
         );
         res.json(result.rows);

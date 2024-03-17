@@ -3,12 +3,15 @@ import ChatsContainer from "../components/ChatsContainer"
 import ChatBox from "../components/ChatBox"
 import { appStyle } from "../assets/homeStyles"
 import { useLocation } from "react-router-dom"
-import { SelectedConversationProvider } from "../components/SelectedConversationContext";
-import { MessageContext, MessageProvider } from "../components/MessageContext"
+import { SelectedConversationProvider } from "../components/Contexts/SelectedConversationContext";
+import { MessageProvider } from "../components/Contexts/MessageContext"
+import { useState } from "react"
+
 
 function Home() {
   const location = useLocation()
   const userData = location.state.data
+  const [friendCount, setFriendCount] = useState(0)
 
   return (
     <SelectedConversationProvider >
@@ -16,9 +19,9 @@ function Home() {
         <div style={appStyle.mainContainer}>
           <div style={appStyle.subContainer}>
             <Toolbar userData={userData} />
-            <ChatsContainer userData={userData} />
+            <ChatsContainer userData={userData} setFriendCount={setFriendCount} />
           </div>
-          <ChatBox userData={userData} />
+          <ChatBox userData={userData} friendCount={friendCount} />
         </div>
       </MessageProvider>
     </SelectedConversationProvider>
