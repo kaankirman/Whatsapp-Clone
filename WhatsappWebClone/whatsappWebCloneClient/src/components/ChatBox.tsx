@@ -25,6 +25,7 @@ interface ChatBoxProps {
 type Message = {
     sender_id: string;
     message_text: string;
+    send_at: string;
 }
 
 type Messages = {
@@ -65,7 +66,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ userData, friendCount }) => {
             if (selectedConversationId === conversationId) {
                 displayIncomingMessage(message);
             }
-            handleAddMessagesToState(conversationId, { sender_id: "other", message_text: message });
+            handleAddMessagesToState(conversationId, { sender_id: "other", message_text: message, send_at: new Date().toISOString()});
         };
 
         socket.on('receive-message', handleReceiveMessage);
@@ -86,8 +87,9 @@ const ChatBox: React.FC<ChatBoxProps> = ({ userData, friendCount }) => {
     }, [messages]);
 
     const sendMessage = () => {
+        if (message.trim() === '') return;
         displayOutgoingMessage(message);
-        handleAddMessagesToState(selectedConversationId!, { sender_id: userData.email, message_text: message });
+        handleAddMessagesToState(selectedConversationId!, { sender_id: userData.email, message_text: message, send_at: new Date().toISOString()});
         socket.emit('send-message', message, selectedConversationId);
         handleSendMessage();
         setMessage('');
@@ -131,6 +133,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ userData, friendCount }) => {
             chatContent.scrollTop = chatContent.scrollHeight;
         }
     };
+        
 
     const displayOutgoingMessage = (message: string) => {
         if (message.trim() === '') return;

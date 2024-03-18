@@ -102,6 +102,7 @@ export const toolbarStyle: ToolbarStyles = {
     width: "50px",
     height: "50px",
     borderRadius: "50%",
+    objectFit: "cover",
   },
   icon: {
     width: "30px",
@@ -237,6 +238,8 @@ type ChatStyles = {
   userTextContainer: React.CSSProperties;
   userText: React.CSSProperties;
   userImage: React.CSSProperties;
+  latestMessage: React.CSSProperties;
+  latestMessageTime: React.CSSProperties;
 };
 
 export const chatStyle: ChatStyles = {
@@ -260,10 +263,27 @@ export const chatStyle: ChatStyles = {
     color: "white",
     fontSize: "1.1em",
   },
+  latestMessage: {
+    margin: "0",
+    paddingTop: "5px",
+    color: "#b3b1b1",
+    width: "200px",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+    fontSize: "0.8em",
+    
+  },
+  latestMessageTime: {
+    margin: "0",
+    color: "#b3b1b1",
+    fontSize: "0.8em",
+  },
   userImage: {
     width: "50px",
     height: "50px",
     borderRadius: "50%",
+    objectFit: "cover",
   },
 };
 
@@ -425,6 +445,8 @@ export const profileModalContentStyle: ProfileModalContentStyles = {
     height: "200px",
     borderRadius: "50%",
     margin: "20px",
+    cursor: "pointer",
+    objectFit: "cover",
   },
   input: {
     background: frameColor,

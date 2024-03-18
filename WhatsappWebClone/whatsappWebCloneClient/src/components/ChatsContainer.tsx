@@ -1,12 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import Chat from './Chat';
-import profilePlaceholder from '../assets/media/bg.jpg';
+import profilePlaceholder from '../assets/media/profilePlaceholder.png';
 import { chatsContainerStyle } from '../assets/homeStyles';
+import { MessageContext } from './Contexts/MessageContext';
 
 interface Friend {
     email: string;
     name: string;
     status: string;
+    url: string;
     conversationId: number;
 }
 
@@ -18,7 +20,7 @@ interface ChatsContainerProps {
 const ChatsContainer: React.FC<ChatsContainerProps> = ({ userData, setFriendCount }) => {
     const serverUrl = import.meta.env.VITE_BASE_URL;
     const [chats, setChats] = useState<Array<Friend>>([]);
-    const image = profilePlaceholder;
+    const { messages } = useContext(MessageContext);
 
     useEffect(() => {
         const fetchFriends = async () => {
@@ -36,18 +38,36 @@ const ChatsContainer: React.FC<ChatsContainerProps> = ({ userData, setFriendCoun
         };
         fetchFriends();
     }, [serverUrl, userData.email]);
+    useEffect(() => {
+        console.log('Chats:', chats);
+        console.log('Messages:', messages);
+        
+    }, [messages]);
+
+    useEffect(() => {
+        const sortedChats = chats.map((chat) => {
+            const latestMessage = messages[chat.conversationId]?.[messages[chat.conversationId].length - 1];
+            console.log('Latest message:', latestMessage);
+            return {
+                ...chat,
+                latestMessageTimestamp: latestMessage ? new Date(latestMessage.send_at).getTime() : 0,
+                status: latestMessage ? latestMessage.message_text : '',
+            };
+        }).sort((a, b) => b.latestMessageTimestamp - a.latestMessageTimestamp);
+        setChats(sortedChats);
+    }, [messages]);
 
     return (
         <div style={chatsContainerStyle.mainContainer}>
             {chats.map((friend) => (
                 <Chat
                     key={friend.conversationId}
-                    image={image}
+                    image={friend.url ? `${serverUrl}/${friend.url}` : profilePlaceholder}
                     email={friend.email}
                     name={friend.name}
                     status={friend.status}
                     conversationId={friend.conversationId}
-                    time=""
+                    time={`${messages[friend.conversationId]?.[messages[friend.conversationId].length-1]?.send_at.split('T')[1].substr(0, 5)}`}
                 />
             ))}
         </div>

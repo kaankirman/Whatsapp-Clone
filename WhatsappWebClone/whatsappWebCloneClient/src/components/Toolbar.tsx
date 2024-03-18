@@ -13,6 +13,7 @@ interface ToolbarProps {
         name: string;
         status: string;
         email: string;
+        url: string;
     };
 }
 
@@ -23,6 +24,9 @@ const Toolbar: React.FC<ToolbarProps> = ({ userData }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [addFriendText, setAddFriendText] = useState<string>('');
     const [friendRequests, setFriendRequests] = useState([]);
+    const imageUrl = `${serverUrl}/${userData.url}`;
+    const profileIcon = imageUrl || profilePlaceholder;
+    
     const toggleMenu = () => {
         setIsOpen(!isOpen);
         setIsFriendListOpen(false);
@@ -68,8 +72,6 @@ const Toolbar: React.FC<ToolbarProps> = ({ userData }) => {
     const fetchFriendRequests = async () => {
         try {
             const response = await fetch(`${serverUrl}/friendRequests/${userData.email}`);
-            console.log(userData.email);
-
             if (!response.ok) {
                 throw new Error('Failed to fetch friend requests');
             }
@@ -88,7 +90,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ userData }) => {
         <div style={toolbarStyle.mainContainer}>
             <ProfileModal isOpen={isModalOpen} userData={userData} onClose={handleCloseModal} />
             <div style={toolbarStyle.userContainer}>
-                <Image src={profilePlaceholder} roundedCircle style={toolbarStyle.profileIcon} />
+                <Image src={profileIcon} roundedCircle style={toolbarStyle.profileIcon} />
                 <div style={toolbarStyle.iconContainer}>
                     <Image src={addIcon} roundedCircle style={toolbarStyle.addIcon} onClick={toggleFriendList} />
                     {isFirendListOpen && (

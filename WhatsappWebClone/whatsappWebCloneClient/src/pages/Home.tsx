@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import Toolbar from '../components/Toolbar';
 import ChatsContainer from '../components/ChatsContainer';
@@ -11,6 +11,8 @@ function HomeLayout() {
   const location = useLocation();
   const userData = location.state.data;
   const [friendCount, setFriendCount] = useState(0);
+
+  
 
   return (
     <div style={appStyle.mainContainer}>

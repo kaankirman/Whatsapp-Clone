@@ -40,10 +40,11 @@ function Chat({ image, name, status, time, conversationId }: ChatProps) {
                 return dateA - dateB;
             });
             updateMessages(conversationId, sortedData);
+            console.log('Messages fetched:', sortedData);
         } catch (error) {
             console.error('Error fetching messages:', error);
         }
-    }
+    };
 
     useEffect(() => {
         fetchMesages();
@@ -55,10 +56,10 @@ function Chat({ image, name, status, time, conversationId }: ChatProps) {
                 <Image src={image} roundedCircle style={chatStyle.userImage} />
                 <div style={chatStyle.userTextContainer}>
                     <h3 style={chatStyle.userText}>{name}</h3>
-                    <p style={chatStyle.userText}>{status}</p>
+                    <p style={chatStyle.latestMessage}>{status}</p>
                 </div>
             </div>
-            <p style={chatStyle.userText}>{time}</p>
+            <p style={chatStyle.latestMessageTime}>{time}</p>
         </div>
     );
 }

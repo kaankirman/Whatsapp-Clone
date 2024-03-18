@@ -3,6 +3,7 @@ import React, { createContext, useState, ReactNode } from 'react';
 interface Message {
   sender_id: string;
   message_text: string;
+  send_at: string;
 }
 
 type Messages = {

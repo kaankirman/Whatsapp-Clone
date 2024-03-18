@@ -9,7 +9,18 @@ const { v4: uuidv4 } = require('uuid');
 const bcrypt = require('bcrypt');
 const token = require('jsonwebtoken');
 const multer = require('multer');
-const upload = multer();
+const path = require('path');
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/'); // Destination folder for storing uploaded files
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, uniqueSuffix + path.extname(file.originalname));
+    }
+});
+const upload =  multer({ storage: storage });
 
 const io = require('socket.io')(SOCKET_PORT, {
     cors: {
@@ -20,10 +31,10 @@ const io = require('socket.io')(SOCKET_PORT, {
 
 app.use(cors());
 app.use(express.json());
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 //socket.io
 io.on('connection', (socket) => {
-    console.log(socket.id);
     socket.on('send-message', (message, conversationId) => {
         socket.to(conversationId).emit('receive-message', message, conversationId);
     })
@@ -67,14 +78,40 @@ app.post('/login', async (req, res) => {
 });
 
 //modify user
-app.patch('/users/:email', upload.none(), async (req, res) => {
+app.patch('/users/:email', upload.single('image'), async (req, res) => {
     const { email } = req.params;
     const { name, status } = req.body;
+    const imagePath = req.file ? req.file.path : null; 
+
     try {
-        await pool.query('UPDATE users SET name = $1, status = $2 WHERE email = $3', [name, status, email]);
-        res.json({ message: "User updated successfully" });
+        let updateFields = [];
+        let queryParams = [];
+        let queryIndex = 1;
+
+        if (name) {
+            updateFields.push(`name = $${queryIndex}`);
+            queryParams.push(name);
+            queryIndex++;
+        }
+
+        if (status) {
+            updateFields.push(`status = $${queryIndex}`);
+            queryParams.push(status);
+            queryIndex++;
+        }
+
+        if (imagePath) {
+            updateFields.push(`url = $${queryIndex}`);
+            queryParams.push(imagePath);
+            queryIndex++;
+        }
+        const updateQuery = `UPDATE users SET ${updateFields.join(', ')} WHERE email = $${queryIndex}`;
+        await pool.query(updateQuery, [...queryParams, email]);
+
+        return res.json({ message: "User updated successfully"});
     } catch (error) {
         console.error(error);
+        return res.status(500).json({ error: 'Internal Server Error' });
     }
 });
 
@@ -137,7 +174,6 @@ app.post('/friends', async (req, res) => {
 
     try {
         const conversationResult = await pool.query('INSERT INTO conversations (title, conversation_type) VALUES ($1, $2) RETURNING *', ["none", "private"]);
-        console.log(conversationResult.rows[0]);
         conversationId = conversationResult.rows[0].conversation_id;
 
         const result = await pool.query(
@@ -173,13 +209,14 @@ app.get('/friends/:userId', async (req, res) => {
 
         const userDataPromises = friendData.map(async (friend) => {
             const userDataResult = await pool.query(
-                'SELECT email, name, status FROM users WHERE email = $1',
+                'SELECT email, name, status, url FROM users WHERE email = $1',
                 [friend.friend_email]
             );
             return {
                 email: userDataResult.rows[0].email,
                 name: userDataResult.rows[0].name,
                 status: userDataResult.rows[0].status,
+                url: userDataResult.rows[0].url,
                 conversationId: friend.conversation_id
             };
         });
@@ -222,5 +259,6 @@ app.get('/messages/:conversationId', async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+
 
 app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
