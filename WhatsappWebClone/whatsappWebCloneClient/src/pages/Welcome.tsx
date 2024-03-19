@@ -2,20 +2,20 @@ import { useState } from 'react';
 import { styles } from '../assets/welcomeStyles';
 import backgroundGif from '../assets/media/WelcomeBg.mp4';
 import { useNavigate } from 'react-router-dom';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import ToastMessage from '../components/ToastContainer'; // Import the ToastMessage component
 
 const Welcome = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [signUpClick, setSignUpClick] = useState(false);
     const [passwordCheck, setPasswordCheck] = useState('');
+    const [toast, setToast] = useState("");
     const navigate = useNavigate();
     const serverUrl = import.meta.env.VITE_BASE_URL;
 
     const handleLogin = async () => {
         setSignUpClick(false);
-        if (email != "" && password != "") {
+        if (email !== "" && password !== "") {
             const response = await fetch(`${serverUrl}/login`, {
                 method: "POST",
                 headers: {
@@ -27,9 +27,8 @@ const Welcome = () => {
                 }),
             });
             const data = await response.json();
-            const notify = () => toast(data.message,
-                { position: "top-center", autoClose: 1000, hideProgressBar: true, closeOnClick: true, pauseOnHover: true, });
-            notify();
+            // Use ToastMessage for displaying notifications
+            setToast(data.message);
             if (data.accessToken) {
                 navigate('/home', { state: { data } });
             }
@@ -38,8 +37,7 @@ const Welcome = () => {
 
     const handleSignUp = async () => {
         setSignUpClick(true);
-        if (email != "" && password == passwordCheck && password !== "" && password !== null && signUpClick == true) {
-            /* send signup info to database */
+        if (email !== "" && password === passwordCheck && password !== "" && password !== null && signUpClick === true) {
             const response = await fetch(`${serverUrl}/signup`, {
                 method: "POST",
                 headers: {
@@ -49,7 +47,6 @@ const Welcome = () => {
                     email: email,
                     password: password,
                 }),
-
             });
             const data = await response.json();
             if (data.accessToken) {
@@ -60,7 +57,7 @@ const Welcome = () => {
 
     return (
         <div style={{ ...styles.content }}>
-            <ToastContainer />
+            {toast && <ToastMessage message={toast} />}
             <video src={backgroundGif} autoPlay muted loop style={styles.backgroundVideo} />
             <div style={styles.cardDiv}>
                 <h1 style={{ ...styles.logo }} onClick={() => window.location.reload()}>Get2Connect</h1>

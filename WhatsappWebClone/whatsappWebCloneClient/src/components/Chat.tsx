@@ -1,14 +1,14 @@
 import Image from 'react-bootstrap/Image';
 import { accentColor, frameColor, chatStyle } from '../assets/homeStyles';
-import { useSelectedConversation } from './Contexts/SelectedConversationContext';
-import { useContext, useEffect } from 'react';
-import { MessageContext } from './Contexts/MessageContext';
+import { useAppContext } from './Contexts/appContext';
+import { useEffect } from 'react';
 interface ChatProps {
     image: string;
     email: string;
     name: string;
     status: string;
     conversationId: number;
+    lastMessage: string;
     time: string;
 }
 
@@ -18,13 +18,14 @@ interface Message {
     send_at: string;
 }
 
-function Chat({ image, name, status, time, conversationId }: ChatProps) {
-    const { selectedConversation, setSelectedConversation } = useSelectedConversation();
-    const { updateMessages } = useContext(MessageContext);
+function Chat({ image, name, status,lastMessage, time, conversationId }: ChatProps) {
+    const { selectedConversation, setSelectedConversation } = useAppContext().selectedConversationContext;
+    const { updateMessages } = useAppContext().messageContext;
+    const { setToast } = useAppContext().toastContext;
     const serverUrl = import.meta.env.VITE_BASE_URL;
 
     const handleClick = () => {
-        setSelectedConversation({ name, conversationId });
+        setSelectedConversation({ name, conversationId, status, profileUrl: image});
     };
 
     const fetchMesages = async () => {
@@ -40,10 +41,15 @@ function Chat({ image, name, status, time, conversationId }: ChatProps) {
                 return dateA - dateB;
             });
             updateMessages(conversationId, sortedData);
-            console.log('Messages fetched:', sortedData);
-        } catch (error) {
-            console.error('Error fetching messages:', error);
-        }
+            console.log('data', time);
+        }  catch (error) {
+            if (error instanceof Error) {
+                console.error(error);
+                setToast(error.message);
+            } else {
+                console.error('Error', error);
+            }
+        };
     };
 
     useEffect(() => {
@@ -56,7 +62,7 @@ function Chat({ image, name, status, time, conversationId }: ChatProps) {
                 <Image src={image} roundedCircle style={chatStyle.userImage} />
                 <div style={chatStyle.userTextContainer}>
                     <h3 style={chatStyle.userText}>{name}</h3>
-                    <p style={chatStyle.latestMessage}>{status}</p>
+                    <p style={chatStyle.latestMessage}>{lastMessage}</p>
                 </div>
             </div>
             <p style={chatStyle.latestMessageTime}>{time}</p>

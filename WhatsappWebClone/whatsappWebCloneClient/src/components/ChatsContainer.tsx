@@ -1,8 +1,8 @@
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Chat from './Chat';
 import profilePlaceholder from '../assets/media/profilePlaceholder.png';
 import { chatsContainerStyle } from '../assets/homeStyles';
-import { MessageContext } from './Contexts/MessageContext';
+import { useAppContext } from './Contexts/appContext';
 
 interface Friend {
     email: string;
@@ -10,6 +10,7 @@ interface Friend {
     status: string;
     url: string;
     conversationId: number;
+    lastMessage: string;
 }
 
 interface ChatsContainerProps {
@@ -20,7 +21,8 @@ interface ChatsContainerProps {
 const ChatsContainer: React.FC<ChatsContainerProps> = ({ userData, setFriendCount }) => {
     const serverUrl = import.meta.env.VITE_BASE_URL;
     const [chats, setChats] = useState<Array<Friend>>([]);
-    const { messages } = useContext(MessageContext);
+    const { messages } = useAppContext().messageContext;
+    const { setToast } = useAppContext().toastContext;
 
     useEffect(() => {
         const fetchFriends = async () => {
@@ -32,30 +34,36 @@ const ChatsContainer: React.FC<ChatsContainerProps> = ({ userData, setFriendCoun
                 const data = await response.json();
                 setChats(data);
                 setFriendCount(data.length);
+                console.log('data', chats);
+                
             } catch (error) {
-                console.error('Error fetching friends:', error);
-            }
+                if (error instanceof Error) {
+                    console.error(error);
+                    setToast(error.message);
+                } else {
+                    console.error('Error', error);
+                }
+            };
         };
         fetchFriends();
     }, [serverUrl, userData.email]);
-    useEffect(() => {
-        console.log('Chats:', chats);
-        console.log('Messages:', messages);
-        
-    }, [messages]);
 
     useEffect(() => {
         const sortedChats = chats.map((chat) => {
             const latestMessage = messages[chat.conversationId]?.[messages[chat.conversationId].length - 1];
-            console.log('Latest message:', latestMessage);
             return {
                 ...chat,
                 latestMessageTimestamp: latestMessage ? new Date(latestMessage.send_at).getTime() : 0,
-                status: latestMessage ? latestMessage.message_text : '',
+                lastMessage: latestMessage ? latestMessage.message_text : '',
             };
         }).sort((a, b) => b.latestMessageTimestamp - a.latestMessageTimestamp);
         setChats(sortedChats);
     }, [messages]);
+
+    const getTime = (friend:Friend) => {
+        const time =messages[friend.conversationId]?.[messages[friend.conversationId].length - 1]?.send_at.split('T')[1].substr(0, 5);
+        return time? time: '';
+    };
 
     return (
         <div style={chatsContainerStyle.mainContainer}>
@@ -66,8 +74,9 @@ const ChatsContainer: React.FC<ChatsContainerProps> = ({ userData, setFriendCoun
                     email={friend.email}
                     name={friend.name}
                     status={friend.status}
+                    lastMessage={friend.lastMessage}
                     conversationId={friend.conversationId}
-                    time={`${messages[friend.conversationId]?.[messages[friend.conversationId].length-1]?.send_at.split('T')[1].substr(0, 5)}`}
+                    time={getTime(friend)}
                 />
             ))}
         </div>

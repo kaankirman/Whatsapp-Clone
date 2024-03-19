@@ -4,6 +4,7 @@ import Image from "react-bootstrap/Image";
 import bg from "../assets/media/bg.jpg";
 import { friendRequestStyle } from "../assets/homeStyles";
 import { useState } from "react";
+import { useAppContext } from "./Contexts/appContext";
 interface FriendRequestProps {
     email: string;
     name: string;
@@ -13,6 +14,7 @@ interface FriendRequestProps {
 function FriendRequest({ email, name, requestId }: FriendRequestProps) {
     const serverUrl = import.meta.env.VITE_BASE_URL;
     const [isRequestAccepted, setIsRequestAccepted] = useState(true);
+    const { setToast } = useAppContext().toastContext;
 
 
     const handleRequest = async () => {
@@ -30,11 +32,18 @@ function FriendRequest({ email, name, requestId }: FriendRequestProps) {
             const data = await response.json();
             if (isRequestAccepted) {
                 handleAddFriend(data.sender_id, data.receiver_id);
+                window.location.reload();
                 setIsRequestAccepted(false);
             }
+            clearFriendRequest();
         } catch (error) {
-            console.error('Error denying friend request:', error);
-        }
+            if (error instanceof Error) {
+                console.error(error);
+                setToast(error.message);
+            } else {
+                console.error('Error', error);
+            }
+        };
     };
 
     const handleAddFriend = async (senderId: string, receiverId: string) => {
@@ -56,36 +65,50 @@ function FriendRequest({ email, name, requestId }: FriendRequestProps) {
             const data = await response.json();
             console.log(data);
         } catch (error) {
-            console.error('Error denying friend request:', error);
+            if (error instanceof Error) {
+                console.error(error);
+                setToast(error.message);
+            } else {
+                console.error('Error', error);
+            }
+        };
+    };
+
+    const clearFriendRequest = () => {
+        const chatContent = document.getElementById('friendRequest');
+        if (chatContent) {
+            chatContent.innerHTML = '';
         }
-    }
+    };
 
     return (
-        <div style={friendRequestStyle.mainContainer}>
-            <Image src={bg} roundedCircle style={friendRequestStyle.image} />
-            <div style={friendRequestStyle.textContainer}>
-                <h3 style={friendRequestStyle.text}>{name}</h3>
-                <h4 style={friendRequestStyle.text}>{email}</h4>
-            </div>
-            <div style={friendRequestStyle.buttonContainer}>
-                <img
-                    style={friendRequestStyle.button}
-                    src={acceptIcon}
-                    onClick={() => {
-                        setIsRequestAccepted(true);
-                        handleRequest();
-                    }}
-                    alt="Accept"
-                />
-                <img
-                    style={friendRequestStyle.button}
-                    src={denyIcon}
-                    onClick={() => {
-                        setIsRequestAccepted(false);
-                        handleRequest();
-                    }}
-                    alt="Deny"
-                />
+        <div id="friendRequest">
+            <div style={friendRequestStyle.mainContainer}>
+                <Image src={bg} roundedCircle style={friendRequestStyle.image} />
+                <div style={friendRequestStyle.textContainer}>
+                    <h3 style={friendRequestStyle.text}>{name}</h3>
+                    <h4 style={friendRequestStyle.emailText}>{email}</h4>
+                </div>
+                <div style={friendRequestStyle.buttonContainer}>
+                    <img
+                        style={friendRequestStyle.button}
+                        src={acceptIcon}
+                        onClick={() => {
+                            setIsRequestAccepted(true);
+                            handleRequest();
+                        }}
+                        alt="Accept"
+                    />
+                    <img
+                        style={friendRequestStyle.button}
+                        src={denyIcon}
+                        onClick={() => {
+                            setIsRequestAccepted(false);
+                            handleRequest();
+                        }}
+                        alt="Deny"
+                    />
+                </div>
             </div>
         </div>
     )

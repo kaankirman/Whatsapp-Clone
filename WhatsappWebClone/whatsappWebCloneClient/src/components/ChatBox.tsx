@@ -1,11 +1,10 @@
-import profilePlaceholder from '../assets/media/profilePlaceholder.png';
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'react-bootstrap/Image';
 import { chatBoxStyle } from '../assets/homeStyles';
 import { io } from 'socket.io-client';
 import sendIcon from '../assets/media/sendIcon.png';
-import { useSelectedConversation } from './Contexts/SelectedConversationContext';
-import { MessageContext } from './Contexts/MessageContext';
+import { useAppContext } from './Contexts/appContext';
+import backIcon from '../assets/media/backIcon.png';
 
 const serverUrl = import.meta.env.VITE_BASE_URL;
 const socketUrl = import.meta.env.VITE_SOCKET_URL;
@@ -35,8 +34,9 @@ type Messages = {
 const ChatBox: React.FC<ChatBoxProps> = ({ userData, friendCount }) => {
     const [message, setMessage] = useState('');
     const [isLoaded, setIsLoaded] = useState(false)
-    const { selectedConversation } = useSelectedConversation();
-    const { messages, updateMessages } = useContext(MessageContext);
+    const { selectedConversation, setSelectedConversation } = useAppContext().selectedConversationContext;
+    const { messages, updateMessages } = useAppContext().messageContext;
+    const { setToast } = useAppContext().toastContext;
     const [currentConversation, setCurrentConversation] = useState(selectedConversation);
 
     useEffect(() => {
@@ -59,6 +59,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ userData, friendCount }) => {
             });
             setCurrentConversation(selectedConversation);
         }
+        console.log('selectedConversation', selectedConversation);
     }, [selectedConversation]);
 
     useEffect(() => {
@@ -66,7 +67,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ userData, friendCount }) => {
             if (selectedConversationId === conversationId) {
                 displayIncomingMessage(message);
             }
-            handleAddMessagesToState(conversationId, { sender_id: "other", message_text: message, send_at: new Date().toISOString()});
+            handleAddMessagesToState(conversationId, { sender_id: "other", message_text: message, send_at: new Date().toISOString() });
         };
 
         socket.on('receive-message', handleReceiveMessage);
@@ -89,7 +90,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ userData, friendCount }) => {
     const sendMessage = () => {
         if (message.trim() === '') return;
         displayOutgoingMessage(message);
-        handleAddMessagesToState(selectedConversationId!, { sender_id: userData.email, message_text: message, send_at: new Date().toISOString()});
+        handleAddMessagesToState(selectedConversationId!, { sender_id: userData.email, message_text: message, send_at: new Date().toISOString() });
         socket.emit('send-message', message, selectedConversationId);
         handleSendMessage();
         setMessage('');
@@ -119,9 +120,14 @@ const ChatBox: React.FC<ChatBoxProps> = ({ userData, friendCount }) => {
                 throw new Error('error sending message');
             }
         } catch (error) {
-            console.error('Error posting sent message:', error);
-        }
-    }
+            if (error instanceof Error) {
+                console.error(error);
+                setToast(error.message);
+            } else {
+                console.error('Error', error);
+            }
+        };
+    };
 
     const displayIncomingMessage = (message: string) => {
         const chatContent = document.getElementById('chatContent');
@@ -133,7 +139,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ userData, friendCount }) => {
             chatContent.scrollTop = chatContent.scrollHeight;
         }
     };
-        
+
 
     const displayOutgoingMessage = (message: string) => {
         if (message.trim() === '') return;
@@ -142,7 +148,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ userData, friendCount }) => {
         if (chatContent) {
             const messageDiv = document.createElement('div');
             messageDiv.textContent = message;
-            messageDiv.style.cssText = 'background-color: #636363; color:white; padding: 10px; margin: 10px; border-radius:10px 0 10px 10px; box-shadow: 0 0 10px 0px black; align-self: flex-end; width: fit-content;';
+            messageDiv.style.cssText = 'background-color: #636363; color:white; padding: 10px; margin: 10px; border-radius:10px 0 10px 10px; box-shadow: 0 0 10px 0px black; align-self: flex-end; width: fit-content; word-wrap: break-word; max-width: 500px;';
             chatContent.appendChild(messageDiv);
             chatContent.scrollTop = chatContent.scrollHeight;
         }
@@ -165,8 +171,11 @@ const ChatBox: React.FC<ChatBoxProps> = ({ userData, friendCount }) => {
         <>
             {isLoaded ? (<div style={chatBoxStyle.mainContainer}>
                 {selectedConversation ? (<div style={chatBoxStyle.userContainer}>
-                    <Image src={profilePlaceholder} roundedCircle style={chatBoxStyle.userIcon} />
-                    <h3 style={chatBoxStyle.userName}>{selectedConversation?.name}</h3>
+                    <Image src={selectedConversation.profileUrl} roundedCircle style={chatBoxStyle.userIcon} />
+                    <div style={chatBoxStyle.userTextContainer}>
+                        <h3 style={chatBoxStyle.userName}>{selectedConversation?.name}</h3>
+                        <p style={chatBoxStyle.userStatus}>{selectedConversation?.status}</p>
+                    </div>
                 </div>) : null}
                 <div id="chatContent" style={chatBoxStyle.chatContent}>
                     {/* Content of the chat box */}
@@ -174,6 +183,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ userData, friendCount }) => {
                 </div>
                 <div style={{ ...chatBoxStyle.inputContainer }}>
                     {selectedConversation ? (<div style={chatBoxStyle.inputBorder}>
+                        <img src={backIcon} style={chatBoxStyle.backIcon} alt="Back" onClick={() => setSelectedConversation(null)} />
                         <input style={chatBoxStyle.messageInput} placeholder="Search or start new chat"
                             type="text"
                             value={message}

@@ -116,6 +116,8 @@ export const toolbarStyle: ToolbarStyles = {
     marginRight: "5px",
   },
   searchIcon: {
+    cursor: "pointer",
+    marginRight: "5px",
     width: "20px",
     height: "20px",
   },
@@ -144,7 +146,7 @@ export const toolbarStyle: ToolbarStyles = {
     borderRadius: "8px",
     listStyle: "none",
     padding: "5px",
-    width: "180px",
+    width: "200px",
     boxShadow: "0 0 5px 0px black",
   },
   friendList: {
@@ -177,6 +179,7 @@ type FriendRequestStyles = {
   text: React.CSSProperties;
   buttonContainer: React.CSSProperties;
   button: React.CSSProperties;
+  emailText: React.CSSProperties;
 };
 
 export const friendRequestStyle: FriendRequestStyles = {
@@ -202,13 +205,28 @@ export const friendRequestStyle: FriendRequestStyles = {
   text: {
     margin: "0px",
     color: "white",
+    width: "180px",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    wordWrap: "break-word",
+    whiteSpace: "nowrap",
+  },
+  emailText: {
+    margin: "0px",
+    color: "#b3b1b1",
+    fontSize: "1em",
+    width: "180px",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    wordWrap: "break-word",
+    whiteSpace: "nowrap",
   },
   buttonContainer: {
     ...defaultStyle.flexRow,
     position: "absolute",
-    right: "5px",
-    height: "30px",
-    width: "30px",
+    right: "10px",
+    height: "35px",
+    width: "35px",
   },
   button: {
     padding: "2px",
@@ -295,9 +313,13 @@ type ChatBoxStyles = {
   userContainer: React.CSSProperties;
   userIcon: React.CSSProperties;
   userName: React.CSSProperties;
+  userStatus: React.CSSProperties;
   sendIcon: React.CSSProperties;
+  backIcon: React.CSSProperties;
   inputBorder: React.CSSProperties;
   placeHolderText: React.CSSProperties;
+  userTextContainer: React.CSSProperties;
+  
 };
 
 export const chatBoxStyle: ChatBoxStyles = {
@@ -318,6 +340,11 @@ export const chatBoxStyle: ChatBoxStyles = {
     ...defaultStyle.flexRow,
     background: frameColor,
     width: "100%",
+  },
+  userTextContainer: {
+    ...defaultStyle.flexColumn,
+    marginLeft: "1vh",
+    justifyContent: "center",
   },
   inputBorder: {
     ...defaultStyle.flexRow,
@@ -352,10 +379,21 @@ export const chatBoxStyle: ChatBoxStyles = {
     borderRadius: "50%",
   },
   userName: {
-    margin: "1vh",
+    margin: "0",
     color: "white",
   },
+  userStatus: {
+    margin: "0",
+    fontSize: "0.8em",
+    color: "#b3b1b1",
+  },
   sendIcon: {
+    cursor: "pointer",
+    padding: "10px",
+    width: "22px",
+    height: "22px",
+  },
+  backIcon: {
     cursor: "pointer",
     padding: "10px",
     width: "22px",
@@ -382,8 +420,9 @@ export const appStyle: AppStyles = {
   mainContainer: {
     ...defaultStyle.flexRow,
     height: "96vh",
-    width: "60%",
-    margin: "2vh 5vh 2vh 20%",
+    minWidth: "60%",
+    maxWidth: "90%",
+    margin: "2vh 20% 2vh 20%",
     boxShadow: "0 0 50px 0px black",
     background: frameColor,
     fontFamily: "Arial, sans-serif",

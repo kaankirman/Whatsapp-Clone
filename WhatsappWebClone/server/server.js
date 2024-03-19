@@ -10,6 +10,8 @@ const bcrypt = require('bcrypt');
 const token = require('jsonwebtoken');
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
+const { error } = require('console');
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -20,7 +22,7 @@ const storage = multer.diskStorage({
         cb(null, uniqueSuffix + path.extname(file.originalname));
     }
 });
-const upload =  multer({ storage: storage });
+const upload = multer({ storage: storage });
 
 const io = require('socket.io')(SOCKET_PORT, {
     cors: {
@@ -49,7 +51,7 @@ app.post('/signup', async (req, res) => {
     const salt = bcrypt.genSaltSync(10);
     const hashedPassword = bcrypt.hashSync(password, salt);
     try {
-        await pool.query('INSERT INTO users (email, hashed_password) VALUES ($1, $2)', [email, hashedPassword]);
+        await pool.query('INSERT INTO users (email, hashed_password, name, status) VALUES ($1, $2, $3, $4)', [email, hashedPassword,"user","Hey there! I am using get2connect!"]);
         const accessToken = token.sign({ email: email }, "secret", { expiresIn: "1h" });
         res.json({ email: email, accessToken: accessToken });
     } catch (error) {
@@ -68,10 +70,22 @@ app.post('/login', async (req, res) => {
         const success = await bcrypt.compare(password, users.rows[0].hashed_password)
         const accessToken = token.sign({ email: email }, "secret", { expiresIn: "1h" });
         if (success) {
-            res.json({ 'email': users.rows[0].email, accessToken: accessToken, 'url': users.rows[0].url, 'name': users.rows[0].name, 'status': users.rows[0].status })
+            res.json({ 'email': users.rows[0].email, accessToken: accessToken })
         } else {
             res.json({ message: "Wrong password" })
         }
+    } catch (error) {
+        console.error(error);
+    }
+});
+
+//get user
+app.get('/users/:email', async (req, res) => {
+    const { email } = req.params;
+    try {
+        const users = await pool.query('SELECT name, status, url FROM users where email = $1', [email]);
+        res.json(users.rows[0]);
+        console.log(users.rows[0]);
     } catch (error) {
         console.error(error);
     }
@@ -81,12 +95,15 @@ app.post('/login', async (req, res) => {
 app.patch('/users/:email', upload.single('image'), async (req, res) => {
     const { email } = req.params;
     const { name, status } = req.body;
-    const imagePath = req.file ? req.file.path : null; 
+    const imagePath = req.file ? req.file.path : null;
 
     try {
         let updateFields = [];
         let queryParams = [];
         let queryIndex = 1;
+
+        const prevImageResult = await pool.query('SELECT url FROM users WHERE email = $1', [email]);
+        const prevImage = prevImageResult.rows[0].url;
 
         if (name) {
             updateFields.push(`name = $${queryIndex}`);
@@ -104,11 +121,19 @@ app.patch('/users/:email', upload.single('image'), async (req, res) => {
             updateFields.push(`url = $${queryIndex}`);
             queryParams.push(imagePath);
             queryIndex++;
+
+            if (prevImage) {
+                fs.unlinkSync(path.join(__dirname, prevImage));
+            }
         }
         const updateQuery = `UPDATE users SET ${updateFields.join(', ')} WHERE email = $${queryIndex}`;
         await pool.query(updateQuery, [...queryParams, email]);
 
-        return res.json({ message: "User updated successfully"});
+        if (imagePath) {
+            res.json({ message: "User updated successfully", url: imagePath });
+        } else {
+            return res.json({ message: "User updated successfully" });
+        }
     } catch (error) {
         console.error(error);
         return res.status(500).json({ error: 'Internal Server Error' });
@@ -120,6 +145,32 @@ app.post('/friendRequests', async (req, res) => {
     const { senderId, receiverId, senderName } = req.body;
 
     try {
+        // Check if receiverId exists in the users table
+        const userCheck = await pool.query('SELECT * FROM users WHERE email = $1', [receiverId]);
+        console.log(userCheck.rows.length);
+        if (userCheck.rows.length === 0) {
+            return res.status(400).json({ error: 'Receiver user not found' });
+        }
+
+        // Check if there is an entry in the friends table
+        const friendsCheck = await pool.query(
+            'SELECT * FROM friends WHERE (sender_id = $1 AND receiver_id = $2) OR (sender_id = $2 AND receiver_id = $1)',
+            [senderId, receiverId]
+        );
+        if (friendsCheck.rows.length > 0) {
+            return res.status(400).json({ error: 'Friendship already exists' });
+        }
+
+        // Check if there is an existing request in friend_requests table
+        const existingRequestCheck = await pool.query(
+            'SELECT * FROM friend_requests WHERE (sender_id = $1 AND receiver_id = $2) OR (sender_id = $2 AND receiver_id = $1)',
+            [senderId, receiverId]
+        );
+        if (existingRequestCheck.rows.length > 0) {
+            return res.status(400).json({ error: 'Friend request already exists' });
+        }
+
+        // Insert the friend request into the friend_requests table
         const result = await pool.query(
             'INSERT INTO friend_requests (sender_id, receiver_id, status, sender_name) VALUES ($1, $2, $3, $4) RETURNING *',
             [senderId, receiverId, 'pending', senderName]

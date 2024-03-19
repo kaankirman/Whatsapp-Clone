@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import Modal from 'react-modal';
 import Image from 'react-bootstrap/Image';
-import profilePlaceholder from '../assets/media/bg.jpg';
 import { profileModalContentStyle, profileModalStyle } from '../assets/homeStyles';
+import { useAppContext } from './Contexts/appContext';
 
 interface ModalProps {
     isOpen: boolean;
@@ -11,7 +11,7 @@ interface ModalProps {
         name: string;
         status: string;
         email: string;
-        url: string;   
+        url: string;
     };
 }
 
@@ -20,7 +20,9 @@ const ProfileModal: React.FC<ModalProps> = ({ isOpen, onClose, userData }) => {
     const [name, setName] = useState<string>('');
     const [status, setStatus] = useState<string>('');
     const [image, setImage] = useState<File | null>(null);
-    const [imageSrc, setImageSrc] = useState<string | undefined>(profilePlaceholder);
+    const [imageSrc, setImageSrc] = useState<string>(''); // Provide an initial value for the useState<string> hook
+    const { setUrl } = useAppContext().userDataContext;
+    const { setToast } = useAppContext().toastContext;
 
     if (userData.url) {
         useEffect(() => {
@@ -49,17 +51,20 @@ const ProfileModal: React.FC<ModalProps> = ({ isOpen, onClose, userData }) => {
                 body: formData,
             });
             const data = await response.json();
-            if (response.ok){
-                /* delete prev picture */
-                
+            if (data.url) {
+                setUrl(data.url);
             }
             console.log(data);
         } catch (error) {
-            console.log(error);
-        }
+            if (error instanceof Error) {
+                console.error(error);
+                setToast(error.message);
+            } else {
+                console.error('Error', error);
+            }
+        };
         onClose();
     };
-    
 
     useEffect(() => {
         setName(userData.name);

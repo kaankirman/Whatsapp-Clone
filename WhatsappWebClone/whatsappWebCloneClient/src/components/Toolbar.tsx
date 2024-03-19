@@ -7,14 +7,10 @@ import { toolbarStyle } from "../assets/homeStyles";
 import React, { useState } from "react";
 import ProfileModal from "./ProfileModal";
 import FriendRequest from "./FriendRequest";
+import { useAppContext, UserData } from "./Contexts/appContext";
 
 interface ToolbarProps {
-    userData: {
-        name: string;
-        status: string;
-        email: string;
-        url: string;
-    };
+    userData: UserData;
 }
 
 const Toolbar: React.FC<ToolbarProps> = ({ userData }) => {
@@ -24,9 +20,10 @@ const Toolbar: React.FC<ToolbarProps> = ({ userData }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [addFriendText, setAddFriendText] = useState<string>('');
     const [friendRequests, setFriendRequests] = useState([]);
+    const { setToast } = useAppContext().toastContext;
     const imageUrl = `${serverUrl}/${userData.url}`;
     const profileIcon = imageUrl || profilePlaceholder;
-    
+
     const toggleMenu = () => {
         setIsOpen(!isOpen);
         setIsFriendListOpen(false);
@@ -62,11 +59,21 @@ const Toolbar: React.FC<ToolbarProps> = ({ userData }) => {
             });
 
             if (!response.ok) {
-                throw new Error('Failed to add friend request');
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to add friend');
+            } else {
+                setToast('Friend request sent');
             }
+            return response.json();
         } catch (error) {
-            console.error('Error adding friend request:', error);
-        }
+            if (error instanceof Error) {
+                console.error(error);
+                setToast(error.message);
+            } else {
+                console.error('Error', error);
+            }
+        };
+        setAddFriendText('');
     };
 
     const fetchFriendRequests = async () => {
@@ -81,8 +88,11 @@ const Toolbar: React.FC<ToolbarProps> = ({ userData }) => {
             });
             setFriendRequests(sortedData);
         } catch (error) {
-            console.error('Error fetching friend requests:', error);
-        }
+            if (error instanceof Error) {
+                console.error('Error denying friend request:', error);
+                setToast(error.message);
+            }
+        };
     };
 
 
@@ -96,7 +106,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ userData }) => {
                     {isFirendListOpen && (
                         <ul style={toolbarStyle.friendList}>
                             <div style={toolbarStyle.firendListSearchContainer}>
-                                <li style={toolbarStyle.friendListItem} > <input style={toolbarStyle.friendSearchInput} placeholder="Enter your friend's email" type="text" onChange={(e) => setAddFriendText(e.target.value)} /> </li>
+                                <li style={toolbarStyle.friendListItem} > <input style={toolbarStyle.friendSearchInput} placeholder="Enter your friend's email" type="text" value={addFriendText} onChange={(e) => setAddFriendText(e.target.value)} /> </li>
                                 <img src={addIcon} style={toolbarStyle.addIcon} onClick={handleAddFriend} alt="" />
                             </div>
                             <div style={toolbarStyle.friendListPendingContainer}>
@@ -106,7 +116,6 @@ const Toolbar: React.FC<ToolbarProps> = ({ userData }) => {
                                     </li>
                                 ))}
                             </div>
-
                         </ul>
                     )}
                     <Image src={menuIcon} roundedCircle style={toolbarStyle.icon} onClick={toggleMenu} />
