@@ -20,7 +20,7 @@ const ProfileModal: React.FC<ModalProps> = ({ isOpen, onClose, userData }) => {
     const [name, setName] = useState<string>('');
     const [status, setStatus] = useState<string>('');
     const [image, setImage] = useState<File | null>(null);
-    const [imageSrc, setImageSrc] = useState<string>(''); // Provide an initial value for the useState<string> hook
+    const [imageSrc, setImageSrc] = useState<string>('');
     const { setUrl } = useAppContext().userDataContext;
     const { setToast } = useAppContext().toastContext;
 

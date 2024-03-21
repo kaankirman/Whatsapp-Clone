@@ -31,7 +31,7 @@ export const Routes = createBrowserRouter([
         element: <App />,
         children: [
             { path: "", element: <Welcome /> },
-            { path: "home", element: <ProtectedRoute element={<Home />} /> }, // Protected route
+            { path: "home", element: <ProtectedRoute element={<Home />} /> },
         ],
     }
 ]);

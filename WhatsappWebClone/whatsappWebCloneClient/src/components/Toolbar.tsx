@@ -4,7 +4,7 @@ import menuIcon from "../assets/media/menuIcon.png";
 import addIcon from "../assets/media/addIcon.png";
 import searchIcon from "../assets/media/searchIcon.png";
 import { toolbarStyle } from "../assets/homeStyles";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import ProfileModal from "./ProfileModal";
 import FriendRequest from "./FriendRequest";
 import { useAppContext, UserData } from "./Contexts/appContext";

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { styles } from '../assets/welcomeStyles';
 import backgroundGif from '../assets/media/WelcomeBg.mp4';
 import { useNavigate } from 'react-router-dom';
-import ToastMessage from '../components/ToastContainer'; // Import the ToastMessage component
+import ToastMessage from '../components/ToastContainer';
 
 const Welcome = () => {
     const [email, setEmail] = useState('');
@@ -27,7 +27,6 @@ const Welcome = () => {
                 }),
             });
             const data = await response.json();
-            // Use ToastMessage for displaying notifications
             setToast(data.message);
             if (data.accessToken) {
                 localStorage.setItem('accessToken', data.accessToken);

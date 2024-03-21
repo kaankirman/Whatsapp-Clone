@@ -71,7 +71,6 @@ const ChatBox: React.FC<ChatBoxProps> = ({ userData, friendCount }) => {
             return;
         }
 
-        // Add the message ID to the set
         receivedMessageIds.add(conversationId);
 
         if (selectedConversationId === conversationId) {
