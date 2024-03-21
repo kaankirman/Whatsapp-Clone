@@ -34,8 +34,6 @@ const ChatsContainer: React.FC<ChatsContainerProps> = ({ userData, setFriendCoun
                 const data = await response.json();
                 setChats(data);
                 setFriendCount(data.length);
-                console.log('data', chats);
-                
             } catch (error) {
                 if (error instanceof Error) {
                     console.error(error);

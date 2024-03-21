@@ -95,7 +95,6 @@ app.get('/users/:email', async (req, res) => {
     try {
         const users = await pool.query('SELECT name, status, url FROM users where email = $1', [email]);
         res.json(users.rows[0]);
-        console.log(users.rows[0]);
     } catch (error) {
         console.error(error);
     }
@@ -157,7 +156,6 @@ app.post('/friendRequests', async (req, res) => {
     try {
         // Check if receiverId exists in the users table
         const userCheck = await pool.query('SELECT * FROM users WHERE email = $1', [receiverId]);
-        console.log(userCheck.rows.length);
         if (userCheck.rows.length === 0) {
             return res.status(400).json({ error: 'Receiver user not found' });
         }

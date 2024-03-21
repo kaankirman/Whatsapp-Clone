@@ -44,7 +44,6 @@ function Chat({ image, name, status, lastMessage, time, conversationId }: ChatPr
                 return dateA - dateB;
             });
             updateMessages(conversationId, sortedData);
-            console.log('data', time);
         } catch (error) {
             if (error instanceof Error) {
                 console.error(error);

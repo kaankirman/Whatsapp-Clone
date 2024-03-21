@@ -63,7 +63,6 @@ const ChatBox: React.FC<ChatBoxProps> = ({ userData, friendCount }) => {
             });
             setCurrentConversation(selectedConversation);
         }
-        console.log('selectedConversation', selectedConversation);
     }, [selectedConversation]);
 
     const handleReceiveMessage = (message: string, conversationId: number) => {
@@ -90,12 +89,6 @@ const ChatBox: React.FC<ChatBoxProps> = ({ userData, friendCount }) => {
     };
 
     socket.on('receive-message', handleReceiveMessage);
-
-
-
-    useEffect(() => {
-        console.log(notifications);
-    }, [messages]);
 
     useEffect(() => {
         if (friendCount === Object.keys(messages).length) {
