@@ -429,7 +429,7 @@ export const appStyle: AppStyles = {
   },
   subContainer: {
     ...defaultStyle.flexColumn,
-    width: "30%",
+    minWidth: "320px",
   },
   placeHolderDiv: {
     display: "flex",

@@ -134,7 +134,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ userData, friendCount }) => {
         if (chatContent) {
             const messageDiv = document.createElement('div');
             messageDiv.textContent = message;
-            messageDiv.style.cssText = 'background-color:#2b2b2b; color: white; padding: 10px; margin: 10px; border: none; border-radius:0 10px 10px 10px; align-self: flex-start;box-shadow: 0 0 10px 0px black; width: fit-content;';
+            messageDiv.style.cssText = 'background-color:#2b2b2b; color: white; padding: 10px; margin: 10px; border: none; border-radius:0 10px 10px 10px; align-self: flex-start;box-shadow: 0 0 10px 0px black; max-width: 400px;';
             chatContent.appendChild(messageDiv);
             chatContent.scrollTop = chatContent.scrollHeight;
         }
@@ -148,7 +148,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ userData, friendCount }) => {
         if (chatContent) {
             const messageDiv = document.createElement('div');
             messageDiv.textContent = message;
-            messageDiv.style.cssText = 'background-color: #636363; color:white; padding: 10px; margin: 10px; border-radius:10px 0 10px 10px; box-shadow: 0 0 10px 0px black; align-self: flex-end; width: fit-content; word-wrap: break-word; max-width: 500px;';
+            messageDiv.style.cssText = 'background-color: #636363; color:white; padding: 10px; margin: 10px; border-radius:10px 0 10px 10px; box-shadow: 0 0 10px 0px black; align-self: flex-end; width: fit-content; word-wrap: break-word; max-width: 400px;';
             chatContent.appendChild(messageDiv);
             chatContent.scrollTop = chatContent.scrollHeight;
         }

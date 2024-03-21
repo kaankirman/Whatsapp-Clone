@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import MediaQuery from 'react-media';
 import Toolbar from '../components/Toolbar';
 import ChatsContainer from '../components/ChatsContainer';
 import ChatBox from '../components/ChatBox';
@@ -12,7 +13,7 @@ function HomeLayoutContent({ userData }: { userData: UserData }) {
   const [friendCount, setFriendCount] = useState(0);
   const { setName, setStatus, setUrl } = useAppContext().userDataContext;
   const { toast, setToast } = useAppContext().toastContext;
-  const { selectedConversation, setSelectedConversation } = useAppContext().selectedConversationContext;
+  const { selectedConversation } = useAppContext().selectedConversationContext;
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -42,11 +43,29 @@ function HomeLayoutContent({ userData }: { userData: UserData }) {
   return (
     <div style={appStyle.mainContainer}>
       {toast && <ToastMessage message={toast} />}
-      <div style={{ ...appStyle.subContainer, ...(selectedConversation ? { display: 'none', width: "0%" } : {}) }}>
-        <Toolbar userData={userData} />
-        <ChatsContainer userData={userData} setFriendCount={setFriendCount} />
-      </div>
-      <ChatBox userData={userData} friendCount={friendCount} />
+      <MediaQuery query="(max-width: 768px)">
+        {matches =>
+          matches ? (
+            <>
+              <div style={{ ...appStyle.subContainer, ...(selectedConversation ? { width: "0%", display: "none" } : { width: "100%" }) }}>
+                <Toolbar userData={userData} />
+                <ChatsContainer userData={userData} setFriendCount={setFriendCount} />
+              </div>
+              <div style={{ ...(selectedConversation ? { width: "100%" } : { width: "0%", display: "none" }) }}>
+                <ChatBox userData={userData} friendCount={friendCount} />
+              </div>
+            </>
+          ) : (
+            <>
+              <div style={appStyle.subContainer}>
+                <Toolbar userData={userData} />
+                <ChatsContainer userData={userData} setFriendCount={setFriendCount} />
+              </div>
+              <ChatBox userData={userData} friendCount={friendCount} />
+            </>
+          )
+        }
+      </MediaQuery>
     </div>
   );
 }
