@@ -51,6 +51,7 @@ const Welcome = () => {
             });
             const data = await response.json();
             if (data.accessToken) {
+                localStorage.setItem('accessToken', data.accessToken);
                 navigate('/home', { state: { data } });
             }
         }
