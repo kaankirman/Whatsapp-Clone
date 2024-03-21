@@ -1,6 +1,6 @@
 import Image from 'react-bootstrap/Image';
 import { accentColor, frameColor, chatStyle } from '../assets/homeStyles';
-import { useAppContext } from './Contexts/appContext';
+import { useAppContext, Notifications } from './Contexts/appContext';
 import { useEffect } from 'react';
 interface ChatProps {
     image: string;
@@ -18,14 +18,16 @@ interface Message {
     send_at: string;
 }
 
-function Chat({ image, name, status,lastMessage, time, conversationId }: ChatProps) {
+function Chat({ image, name, status, lastMessage, time, conversationId }: ChatProps) {
     const { selectedConversation, setSelectedConversation } = useAppContext().selectedConversationContext;
     const { updateMessages } = useAppContext().messageContext;
     const { setToast } = useAppContext().toastContext;
+    const { notifications, updateNotifications } = useAppContext().notificationContext;
     const serverUrl = import.meta.env.VITE_BASE_URL;
 
     const handleClick = () => {
-        setSelectedConversation({ name, conversationId, status, profileUrl: image});
+        setSelectedConversation({ name, conversationId, status, profileUrl: image });
+        updateNotifications(conversationId, { count: 0 });
     };
 
     const fetchMesages = async () => {
@@ -42,7 +44,7 @@ function Chat({ image, name, status,lastMessage, time, conversationId }: ChatPro
             });
             updateMessages(conversationId, sortedData);
             console.log('data', time);
-        }  catch (error) {
+        } catch (error) {
             if (error instanceof Error) {
                 console.error(error);
                 setToast(error.message);
@@ -65,7 +67,11 @@ function Chat({ image, name, status,lastMessage, time, conversationId }: ChatPro
                     <p style={chatStyle.latestMessage}>{lastMessage}</p>
                 </div>
             </div>
-            <p style={chatStyle.latestMessageTime}>{time}</p>
+            <p style={chatStyle.latestMessageTime}>{notifications[conversationId] && notifications[conversationId].count > 0 && (
+                <div style={chatStyle.notificationContainer}>
+                    {notifications[conversationId].count}
+                </div>
+            )} {time}</p>
         </div>
     );
 }

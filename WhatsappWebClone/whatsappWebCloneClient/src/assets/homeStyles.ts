@@ -258,6 +258,7 @@ type ChatStyles = {
   userImage: React.CSSProperties;
   latestMessage: React.CSSProperties;
   latestMessageTime: React.CSSProperties;
+  notificationContainer: React.CSSProperties;
 };
 
 export const chatStyle: ChatStyles = {
@@ -285,7 +286,7 @@ export const chatStyle: ChatStyles = {
     margin: "0",
     paddingTop: "5px",
     color: "#b3b1b1",
-    width: "200px",
+    width: "100px",
     overflow: "hidden",
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
@@ -302,6 +303,18 @@ export const chatStyle: ChatStyles = {
     height: "50px",
     borderRadius: "50%",
     objectFit: "cover",
+  },
+  notificationContainer: {
+    margin: "0px 0px 10px 6px",
+    background: "rgb(5 193 37 / 72%)",
+    color: "white",
+    borderRadius: "60%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    height:" 20px",
+    width: "20px",
+    boxShadow: "0px 0px 5px 1px black"
   },
 };
 

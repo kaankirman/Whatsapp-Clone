@@ -8,12 +8,14 @@ import React, { useState } from "react";
 import ProfileModal from "./ProfileModal";
 import FriendRequest from "./FriendRequest";
 import { useAppContext, UserData } from "./Contexts/appContext";
+import { useNavigate } from 'react-router-dom';
 
 interface ToolbarProps {
     userData: UserData;
 }
 
 const Toolbar: React.FC<ToolbarProps> = ({ userData }) => {
+    const navigate = useNavigate();
     const serverUrl = import.meta.env.VITE_BASE_URL;
     const [isOpen, setIsOpen] = useState(false);
     const [isFirendListOpen, setIsFriendListOpen] = useState(false);
@@ -95,6 +97,33 @@ const Toolbar: React.FC<ToolbarProps> = ({ userData }) => {
         };
     };
 
+    const handleLogout = async () => {
+        try {
+            const accessToken = localStorage.getItem('accessToken');
+            if (!accessToken) {
+                navigate('/');
+                return;
+            }
+            const response = await fetch(`${serverUrl}/logout`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${accessToken}`
+                }
+            });
+            if (response.ok) {
+                localStorage.removeItem('accessToken');
+                navigate('/');
+            } else {
+                const data = await response.json();
+                setToast(data.message || "Failed to logout");
+            }
+        } catch (error) {
+            console.error("Error logging out:", error);
+            setToast("Failed to logout");
+        }
+    };
+
 
     return (
         <div style={toolbarStyle.mainContainer}>
@@ -123,7 +152,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ userData }) => {
                         <ul style={toolbarStyle.list}>
                             <li style={toolbarStyle.listItem} onClick={handleOpenModal}>Profile</li>
                             <li style={toolbarStyle.listItem} >Change chat background</li>
-                            <li style={toolbarStyle.listItem} >Logout</li>
+                            <li style={toolbarStyle.listItem} onClick={handleLogout}>Logout</li>
                         </ul>
                     )}
                 </div>

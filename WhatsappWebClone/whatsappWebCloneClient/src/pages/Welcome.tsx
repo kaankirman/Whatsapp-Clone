@@ -30,6 +30,7 @@ const Welcome = () => {
             // Use ToastMessage for displaying notifications
             setToast(data.message);
             if (data.accessToken) {
+                localStorage.setItem('accessToken', data.accessToken);
                 navigate('/home', { state: { data } });
             }
         }

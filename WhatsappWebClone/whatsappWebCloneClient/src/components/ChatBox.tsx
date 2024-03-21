@@ -5,6 +5,7 @@ import { io } from 'socket.io-client';
 import sendIcon from '../assets/media/sendIcon.png';
 import { useAppContext } from './Contexts/appContext';
 import backIcon from '../assets/media/backIcon.png';
+import MediaQuery from 'react-media';
 
 const serverUrl = import.meta.env.VITE_BASE_URL;
 const socketUrl = import.meta.env.VITE_SOCKET_URL;
@@ -37,7 +38,10 @@ const ChatBox: React.FC<ChatBoxProps> = ({ userData, friendCount }) => {
     const { selectedConversation, setSelectedConversation } = useAppContext().selectedConversationContext;
     const { messages, updateMessages } = useAppContext().messageContext;
     const { setToast } = useAppContext().toastContext;
+    const { notifications, updateNotifications } = useAppContext().notificationContext;
     const [currentConversation, setCurrentConversation] = useState(selectedConversation);
+
+
 
     useEffect(() => {
         if (currentConversation?.conversationId === selectedConversation?.conversationId) {
@@ -62,20 +66,36 @@ const ChatBox: React.FC<ChatBoxProps> = ({ userData, friendCount }) => {
         console.log('selectedConversation', selectedConversation);
     }, [selectedConversation]);
 
-    useEffect(() => {
-        const handleReceiveMessage = (message: string, conversationId: number) => {
-            if (selectedConversationId === conversationId) {
-                displayIncomingMessage(message);
-            }
-            handleAddMessagesToState(conversationId, { sender_id: "other", message_text: message, send_at: new Date().toISOString() });
-        };
+    const handleReceiveMessage = (message: string, conversationId: number) => {
+        const receivedMessageIds = new Set<number>();
+        if (receivedMessageIds.has(conversationId)) {
+            return;
+        }
 
-        socket.on('receive-message', handleReceiveMessage);
+        // Add the message ID to the set
+        receivedMessageIds.add(conversationId);
 
+        if (selectedConversationId === conversationId) {
+            displayIncomingMessage(message);
+        } else {
+            const currentNotification = notifications[conversationId] || { count: 0 };
+            const updatedNotification = { count: currentNotification.count + 1 };
+            updateNotifications(conversationId, updatedNotification);
+        }
+
+        handleAddMessagesToState(conversationId, { sender_id: "other", message_text: message, send_at: new Date().toISOString() });
         return () => {
             socket.off('receive-message', handleReceiveMessage);
         };
-    }, []);
+    };
+
+    socket.on('receive-message', handleReceiveMessage);
+
+
+
+    useEffect(() => {
+        console.log(notifications);
+    }, [messages]);
 
     useEffect(() => {
         if (friendCount === Object.keys(messages).length) {
@@ -183,7 +203,13 @@ const ChatBox: React.FC<ChatBoxProps> = ({ userData, friendCount }) => {
                 </div>
                 <div style={{ ...chatBoxStyle.inputContainer }}>
                     {selectedConversation ? (<div style={chatBoxStyle.inputBorder}>
-                        <img src={backIcon} style={chatBoxStyle.backIcon} alt="Back" onClick={() => setSelectedConversation(null)} />
+                        <MediaQuery query="(max-width: 768px)">
+                            {matches =>
+                                matches ? (
+                                    <img src={backIcon} style={chatBoxStyle.backIcon} alt="Back" onClick={() => setSelectedConversation(null)} />
+                                ) : null
+                            }
+                        </MediaQuery>
                         <input style={chatBoxStyle.messageInput} placeholder="Search or start new chat"
                             type="text"
                             value={message}

@@ -5,7 +5,7 @@ export interface UserData {
     name: string;
     status: string;
     email: string;
-    url: string; // Profile image URL included here
+    url: string;
 }
 
 interface UserDataContextType {
@@ -13,7 +13,7 @@ interface UserDataContextType {
     setName: (name: string) => void;
     setStatus: (status: string) => void;
     setEmail: (email: string) => void;
-    setUrl: (url: string) => void; // Adding setUrl setter function
+    setUrl: (url: string) => void;
 }
 
 // Selected Conversation Context
@@ -53,11 +53,28 @@ interface ToastContextType {
     setToast: (message: string) => void;
 }
 
+// Notification Context
+interface Notification {
+    count: number;
+}
+
+export type Notifications = {
+    [conversationId: number]: Notification;
+}
+
+type UpdateNotifications = (conversationId: number, newNotifications: Notification) => void;
+
+interface NotificationContextType {
+    notifications: Notifications;
+    updateNotifications: UpdateNotifications;
+}
+
 const AppContext = createContext<{
     userDataContext: UserDataContextType;
     selectedConversationContext: SelectedConversationContextType;
     messageContext: MessageContextType;
     toastContext: ToastContextType;
+    notificationContext: NotificationContextType;
 } | undefined>(undefined);
 
 export const useAppContext = () => {
@@ -80,7 +97,8 @@ export const AppContextProvider: React.FC<AppContextProviderProps> = ({ children
     const [url, setUrl] = useState<string>('');
     const [selectedConversation, setSelectedConversation] = useState<SelectedConversation | null>(null);
     const [messages, setMessages] = useState<Messages>({});
-    const [toast, setToast] = useState<string>("");
+    const [toast, setToast] = useState<string>('');
+    const [notifications, setNotifications] = useState<Notifications>({});
 
     const userData: UserData = {
         name,
@@ -93,6 +111,13 @@ export const AppContextProvider: React.FC<AppContextProviderProps> = ({ children
         setMessages(prevMessages => ({
             ...prevMessages,
             [conversationId]: newMessages
+        }));
+    };
+
+    const updateNotifications: UpdateNotifications = (conversationId, newNotifications) => {
+        setNotifications(prevNotifications => ({
+            ...prevNotifications,
+            [conversationId]: newNotifications
         }));
     };
 
@@ -119,8 +144,13 @@ export const AppContextProvider: React.FC<AppContextProviderProps> = ({ children
         setToast
     };
 
+    const notificationContext: NotificationContextType = {
+        notifications,
+        updateNotifications
+    };
+
     return (
-        <AppContext.Provider value={{ userDataContext, selectedConversationContext, messageContext, toastContext }}>
+        <AppContext.Provider value={{ userDataContext, selectedConversationContext, messageContext, toastContext, notificationContext }}>
             {children}
         </AppContext.Provider>
     );

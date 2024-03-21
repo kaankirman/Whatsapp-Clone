@@ -79,6 +79,16 @@ app.post('/login', async (req, res) => {
     }
 });
 
+//logout
+app.post('/logout', (req, res) => {
+    const token = req.headers.authorization;
+    
+    if (token == null) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+    res.json({ message: "Logged out successfully" });
+});
+
 //get user
 app.get('/users/:email', async (req, res) => {
     const { email } = req.params;
