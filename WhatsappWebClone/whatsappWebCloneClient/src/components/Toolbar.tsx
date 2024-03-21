@@ -4,7 +4,7 @@ import menuIcon from "../assets/media/menuIcon.png";
 import addIcon from "../assets/media/addIcon.png";
 import searchIcon from "../assets/media/searchIcon.png";
 import { toolbarStyle } from "../assets/homeStyles";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ProfileModal from "./ProfileModal";
 import FriendRequest from "./FriendRequest";
 import { useAppContext, UserData } from "./Contexts/appContext";
@@ -22,6 +22,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ userData }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [addFriendText, setAddFriendText] = useState<string>('');
     const [friendRequests, setFriendRequests] = useState([]);
+    const {search,setSearch} = useAppContext().searchConversationContext;
     const { setToast } = useAppContext().toastContext;
     const imageUrl = `${serverUrl}/${userData.url}`;
     const profileIcon = imageUrl || profilePlaceholder;
@@ -151,7 +152,6 @@ const Toolbar: React.FC<ToolbarProps> = ({ userData }) => {
                     {isOpen && (
                         <ul style={toolbarStyle.list}>
                             <li style={toolbarStyle.listItem} onClick={handleOpenModal}>Profile</li>
-                            <li style={toolbarStyle.listItem} >Change chat background</li>
                             <li style={toolbarStyle.listItem} onClick={handleLogout}>Logout</li>
                         </ul>
                     )}
@@ -160,7 +160,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ userData }) => {
             <div style={toolbarStyle.spacerContainer}>
                 <div style={toolbarStyle.searchbarContainer}>
                     <Image src={searchIcon} roundedCircle style={toolbarStyle.searchIcon} />
-                    <input style={toolbarStyle.searchInput} placeholder="Search for a chat" />
+                    <input style={toolbarStyle.searchInput} value={search} onChange={(e) => setSearch(e.target.value)}  placeholder="Search for a chat"/>
                 </div>
             </div>
         </div>

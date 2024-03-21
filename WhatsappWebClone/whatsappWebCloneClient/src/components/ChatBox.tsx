@@ -210,7 +210,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ userData, friendCount }) => {
                                 ) : null
                             }
                         </MediaQuery>
-                        <input style={chatBoxStyle.messageInput} placeholder="Search or start new chat"
+                        <input style={chatBoxStyle.messageInput} placeholder="Type a message"
                             type="text"
                             value={message}
                             onChange={(e) => setMessage(e.target.value)}

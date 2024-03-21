@@ -1,6 +1,6 @@
 import Image from 'react-bootstrap/Image';
 import { accentColor, frameColor, chatStyle } from '../assets/homeStyles';
-import { useAppContext, Notifications } from './Contexts/appContext';
+import { useAppContext } from './Contexts/appContext';
 import { useEffect } from 'react';
 interface ChatProps {
     image: string;
@@ -23,6 +23,7 @@ function Chat({ image, name, status, lastMessage, time, conversationId }: ChatPr
     const { updateMessages } = useAppContext().messageContext;
     const { setToast } = useAppContext().toastContext;
     const { notifications, updateNotifications } = useAppContext().notificationContext;
+    const { search } = useAppContext().searchConversationContext;
     const serverUrl = import.meta.env.VITE_BASE_URL;
 
     const handleClick = () => {
@@ -59,20 +60,23 @@ function Chat({ image, name, status, lastMessage, time, conversationId }: ChatPr
     }, []);
 
     return (
-        <div onClick={handleClick} style={{ ...chatStyle.mainContainer, background: selectedConversation?.conversationId == conversationId ? accentColor : frameColor }}>
-            <div style={chatStyle.userContainer}>
-                <Image src={image} roundedCircle style={chatStyle.userImage} />
-                <div style={chatStyle.userTextContainer}>
-                    <h3 style={chatStyle.userText}>{name}</h3>
-                    <p style={chatStyle.latestMessage}>{lastMessage}</p>
+        (!search || (name && name.toLowerCase().includes(search.toLowerCase()))) ?
+            (
+                <div onClick={handleClick} style={{ ...chatStyle.mainContainer, background: selectedConversation?.conversationId == conversationId ? accentColor : frameColor }}>
+                    <div style={chatStyle.userContainer}>
+                        <Image src={image} roundedCircle style={chatStyle.userImage} />
+                        <div style={chatStyle.userTextContainer}>
+                            <h3 style={chatStyle.userText}>{name}</h3>
+                            <p style={chatStyle.latestMessage}>{lastMessage}</p>
+                        </div>
+                    </div>
+                    <p style={chatStyle.latestMessageTime}>{notifications[conversationId] && notifications[conversationId].count > 0 && (
+                        <div style={chatStyle.notificationContainer}>
+                            {notifications[conversationId].count}
+                        </div>
+                    )} {time}</p>
                 </div>
-            </div>
-            <p style={chatStyle.latestMessageTime}>{notifications[conversationId] && notifications[conversationId].count > 0 && (
-                <div style={chatStyle.notificationContainer}>
-                    {notifications[conversationId].count}
-                </div>
-            )} {time}</p>
-        </div>
+            ) : null
     );
 }
 

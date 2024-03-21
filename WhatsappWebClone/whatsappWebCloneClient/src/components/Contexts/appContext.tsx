@@ -53,6 +53,12 @@ interface ToastContextType {
     setToast: (message: string) => void;
 }
 
+// Search Conversation Context
+interface SearchConversationContextType {
+    search: string;
+    setSearch: (search: string) => void;
+}
+
 // Notification Context
 interface Notification {
     count: number;
@@ -75,6 +81,7 @@ const AppContext = createContext<{
     messageContext: MessageContextType;
     toastContext: ToastContextType;
     notificationContext: NotificationContextType;
+    searchConversationContext: SearchConversationContextType;
 } | undefined>(undefined);
 
 export const useAppContext = () => {
@@ -99,6 +106,7 @@ export const AppContextProvider: React.FC<AppContextProviderProps> = ({ children
     const [messages, setMessages] = useState<Messages>({});
     const [toast, setToast] = useState<string>('');
     const [notifications, setNotifications] = useState<Notifications>({});
+    const [search, setSearch] = useState<string>('');
 
     const userData: UserData = {
         name,
@@ -149,8 +157,13 @@ export const AppContextProvider: React.FC<AppContextProviderProps> = ({ children
         updateNotifications
     };
 
+    const searchConversationContext: SearchConversationContextType = {
+        search,
+        setSearch
+    };
+
     return (
-        <AppContext.Provider value={{ userDataContext, selectedConversationContext, messageContext, toastContext, notificationContext }}>
+        <AppContext.Provider value={{ userDataContext, selectedConversationContext, messageContext, toastContext, notificationContext,searchConversationContext }}>
             {children}
         </AppContext.Provider>
     );

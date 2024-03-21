@@ -146,7 +146,7 @@ export const toolbarStyle: ToolbarStyles = {
     borderRadius: "8px",
     listStyle: "none",
     padding: "5px",
-    width: "200px",
+    width: "70px",
     boxShadow: "0 0 5px 0px black",
   },
   friendList: {
