@@ -5,13 +5,11 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 const pool = require('./db');
-const { v4: uuidv4 } = require('uuid');
 const bcrypt = require('bcrypt');
 const token = require('jsonwebtoken');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const { error } = require('console');
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -83,7 +81,7 @@ app.post('/login', async (req, res) => {
 app.post('/logout', (req, res) => {
     const token = req.headers.authorization;
     
-    if (token == null) {
+    if (!token) {
         return res.status(401).json({ message: 'Unauthorized' });
     }
     res.json({ message: "Logged out successfully" });

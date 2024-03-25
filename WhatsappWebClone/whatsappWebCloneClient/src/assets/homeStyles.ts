@@ -93,10 +93,10 @@ export const toolbarStyle: ToolbarStyles = {
     borderRadius: "8px",
   },
   friendListPendingContainer: {
-    maxHeight:"185px",
-    whiteSpace:"nowrap",
-    overflow:"auto",
-    scrollbarWidth:"none"
+    maxHeight: "185px",
+    whiteSpace: "nowrap",
+    overflow: "auto",
+    scrollbarWidth: "none",
   },
   profileIcon: {
     width: "50px",
@@ -185,11 +185,11 @@ type FriendRequestStyles = {
 export const friendRequestStyle: FriendRequestStyles = {
   mainContainer: {
     ...defaultStyle.flexRow,
-    position:"relative",
+    position: "relative",
     alignItems: "center",
-    justifyContent:"left",
-    width:"270px",
-    margin:"5px"
+    justifyContent: "left",
+    width: "270px",
+    margin: "5px",
   },
   textContainer: {
     ...defaultStyle.flexColumn,
@@ -291,7 +291,6 @@ export const chatStyle: ChatStyles = {
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
     fontSize: "0.8em",
-    
   },
   latestMessageTime: {
     margin: "0",
@@ -312,9 +311,9 @@ export const chatStyle: ChatStyles = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    height:" 20px",
+    height: " 20px",
     width: "20px",
-    boxShadow: "0px 0px 5px 1px black"
+    boxShadow: "0px 0px 5px 1px black",
   },
 };
 
@@ -332,7 +331,10 @@ type ChatBoxStyles = {
   inputBorder: React.CSSProperties;
   placeHolderText: React.CSSProperties;
   userTextContainer: React.CSSProperties;
-  
+  incomingMessageText: React.CSSProperties;
+  incomingMessageTimeText: React.CSSProperties;
+  outgoingMessageText: React.CSSProperties;
+  outgoingMessageTimeText: React.CSSProperties;
 };
 
 export const chatBoxStyle: ChatBoxStyles = {
@@ -372,10 +374,11 @@ export const chatBoxStyle: ChatBoxStyles = {
     overflow: "auto",
     maxHeight: "100%",
     scrollbarWidth: "none",
-    backgroundImage:`url(${chatContentBg})`,
-    backgroundSize:"cover",
+    backgroundImage: `url(${chatContentBg})`,
+    backgroundSize: "cover",
     flex: 1,
     justifyContent: "flex-between",
+    boxShadow: "inset 0 0 30px 0px black",
   },
   messageInput: {
     background: frameColor,
@@ -415,11 +418,50 @@ export const chatBoxStyle: ChatBoxStyles = {
   placeHolderText: {
     position: "absolute",
     top: "50%",
-    margin:"0",
-    padding:"0",
-    color:"white",
+    margin: "0",
+    padding: "0",
+    color: "white",
     alignSelf: "center",
     fontSize: "1.5em",
+  },
+  incomingMessageText: {
+    backgroundColor: "#2b2b2b",
+    color: "white",
+    padding: "10px 20px 20px 10px",
+    margin: "10px",
+    border: "none",
+    borderRadius: "0 10px 10px 10px",
+    alignSelf: "flex-start",
+    boxShadow: "0 0 10px 0px black",
+    maxWidth: "350px",
+    position: "relative",
+  },
+  incomingMessageTimeText: {
+    fontSize: "0.7em",
+    color: "#b3b1b150",
+    position: "absolute",
+    bottom: "5px",
+    right: "5px",
+  },
+  outgoingMessageText: {
+    backgroundColor: "#636363",
+    color: "white",
+    padding: "10px 20px 20px 10px",
+    margin: "10px",
+    borderRadius: "10px 0 10px 10px",
+    boxShadow: "0 0 10px 0px black",
+    alignSelf: "flex-end",
+    width: "fit-content",
+    wordWrap: "break-word",
+    maxWidth: "350px",
+    position: "relative",
+  },
+  outgoingMessageTimeText: {
+    fontSize: "0.7em",
+    color: "#FFFFFF50",
+    position: "absolute",
+    bottom: "5px",
+    right: "5px",
   },
 };
 
@@ -450,7 +492,7 @@ export const appStyle: AppStyles = {
     alignItems: "center",
     width: "100%",
     color: frameColor,
-    background:accentColor,
+    background: accentColor,
     fontSize: "2em",
   },
 };

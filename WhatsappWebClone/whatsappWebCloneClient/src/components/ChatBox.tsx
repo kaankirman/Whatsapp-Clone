@@ -53,12 +53,13 @@ const ChatBox: React.FC<ChatBoxProps> = ({ userData, friendCount }) => {
             socket.emit('join-conversation', selectedConversation?.conversationId);
             const messagesArray = messages[selectedConversationId!] || [];
             messagesArray.forEach(messageObj => {
-                const { message_text } = messageObj;
+                const { message_text, send_at } = messageObj;
+                const messageTime = send_at.split('T')[1].substr(0, 5);
                 if (messageObj.sender_id === userData.email) {
-                    displayOutgoingMessage(message_text);
+                    displayOutgoingMessage(message_text, messageTime);
                 }
                 else {
-                    displayIncomingMessage(message_text);
+                    displayIncomingMessage(message_text, messageTime);
                 }
             });
             setCurrentConversation(selectedConversation);
@@ -70,17 +71,14 @@ const ChatBox: React.FC<ChatBoxProps> = ({ userData, friendCount }) => {
         if (receivedMessageIds.has(conversationId)) {
             return;
         }
-
         receivedMessageIds.add(conversationId);
-
         if (selectedConversationId === conversationId) {
-            displayIncomingMessage(message);
+            displayIncomingMessage(message, new Date().toISOString().split('T')[1].substr(0, 5));
         } else {
             const currentNotification = notifications[conversationId] || { count: 0 };
             const updatedNotification = { count: currentNotification.count + 1 };
             updateNotifications(conversationId, updatedNotification);
         }
-
         handleAddMessagesToState(conversationId, { sender_id: "other", message_text: message, send_at: new Date().toISOString() });
         return () => {
             socket.off('receive-message', handleReceiveMessage);
@@ -101,8 +99,9 @@ const ChatBox: React.FC<ChatBoxProps> = ({ userData, friendCount }) => {
 
     const sendMessage = () => {
         if (message.trim() === '') return;
-        displayOutgoingMessage(message);
-        handleAddMessagesToState(selectedConversationId!, { sender_id: userData.email, message_text: message, send_at: new Date().toISOString() });
+        const time = new Date().toISOString();
+        displayOutgoingMessage(message, time.split('T')[1].substr(0, 5));
+        handleAddMessagesToState(selectedConversationId!, { sender_id: userData.email, message_text: message, send_at: time });
         socket.emit('send-message', message, selectedConversationId);
         handleSendMessage();
         setMessage('');
@@ -127,7 +126,6 @@ const ChatBox: React.FC<ChatBoxProps> = ({ userData, friendCount }) => {
                     message: message,
                 }),
             });
-
             if (!response.ok) {
                 throw new Error('error sending message');
             }
@@ -141,30 +139,37 @@ const ChatBox: React.FC<ChatBoxProps> = ({ userData, friendCount }) => {
         };
     };
 
-    const displayIncomingMessage = (message: string) => {
-        const chatContent = document.getElementById('chatContent');
-        if (chatContent) {
-            const messageDiv = document.createElement('div');
-            messageDiv.textContent = message;
-            messageDiv.style.cssText = 'background-color:#2b2b2b; color: white; padding: 10px; margin: 10px; border: none; border-radius:0 10px 10px 10px; align-self: flex-start;box-shadow: 0 0 10px 0px black; max-width: 400px;';
-            chatContent.appendChild(messageDiv);
-            chatContent.scrollTop = chatContent.scrollHeight;
-        }
-    };
+    const displayIncomingMessage = (message: string, messageTime: string) => {
+    const chatContent = document.getElementById('chatContent');
+    if (chatContent) {
+        const messageDiv = document.createElement('div');
+        const timeDiv = document.createElement('div');
+        messageDiv.textContent = message;
+        timeDiv.textContent = messageTime;
+        Object.assign(messageDiv.style, chatBoxStyle.incomingMessageText);
+        Object.assign(timeDiv.style, chatBoxStyle.incomingMessageTimeText);
+        messageDiv.appendChild(timeDiv);
+        chatContent.appendChild(messageDiv);
+        chatContent.scrollTop = chatContent.scrollHeight;
+    }
+};
 
+const displayOutgoingMessage = (message: string, messageTime: string) => {
+    if (message.trim() === '') return;
 
-    const displayOutgoingMessage = (message: string) => {
-        if (message.trim() === '') return;
-
-        const chatContent = document.getElementById('chatContent');
-        if (chatContent) {
-            const messageDiv = document.createElement('div');
-            messageDiv.textContent = message;
-            messageDiv.style.cssText = 'background-color: #636363; color:white; padding: 10px; margin: 10px; border-radius:10px 0 10px 10px; box-shadow: 0 0 10px 0px black; align-self: flex-end; width: fit-content; word-wrap: break-word; max-width: 400px;';
-            chatContent.appendChild(messageDiv);
-            chatContent.scrollTop = chatContent.scrollHeight;
-        }
-    };
+    const chatContent = document.getElementById('chatContent');
+    if (chatContent) {
+        const messageDiv = document.createElement('div');
+        const timeDiv = document.createElement('div');
+        messageDiv.textContent = message;
+        timeDiv.textContent = messageTime;
+        Object.assign(messageDiv.style, chatBoxStyle.outgoingMessageText);
+        Object.assign(timeDiv.style, chatBoxStyle.outgoingMessageTimeText);
+        messageDiv.appendChild(timeDiv);
+        chatContent.appendChild(messageDiv);
+        chatContent.scrollTop = chatContent.scrollHeight;
+    }
+};
 
     const clearChatContent = () => {
         const chatContent = document.getElementById('chatContent');
