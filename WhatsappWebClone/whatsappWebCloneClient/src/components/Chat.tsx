@@ -1,5 +1,5 @@
 import Image from 'react-bootstrap/Image';
-import { accentColor, frameColor, chatStyle } from '../assets/homeStyles';
+import { accentColor, frameColor, chatStyle, defaultStyle } from '../assets/homeStyles';
 import { useAppContext } from './Contexts/appContext';
 import { useEffect } from 'react';
 interface ChatProps {
@@ -34,6 +34,8 @@ function Chat({ image, name, status, lastMessage, time, conversationId }: ChatPr
     const fetchMesages = async () => {
         try {
             const response = await fetch(`${serverUrl}/messages/${conversationId}`);
+            updateNotifications(conversationId, { count: 0 });
+
             if (!response.ok) {
                 throw new Error('Failed to fetch messages.');
             }
@@ -69,11 +71,14 @@ function Chat({ image, name, status, lastMessage, time, conversationId }: ChatPr
                             <p style={chatStyle.latestMessage}>{lastMessage}</p>
                         </div>
                     </div>
-                    <p style={chatStyle.latestMessageTime}>{notifications[conversationId] && notifications[conversationId].count > 0 && (
-                        <div style={chatStyle.notificationContainer}>
-                            {notifications[conversationId].count}
-                        </div>
-                    )} {time}</p>
+                    <div style={defaultStyle.flexColumn}>
+                        {notifications[conversationId] && notifications[conversationId].count > 0 && (
+                            <div style={chatStyle.notificationContainer}>
+                                {notifications[conversationId].count}
+                            </div>
+                        )}
+                        <p style={chatStyle.latestMessageTime}> {time}</p>
+                    </div>
                 </div>
             ) : null
     );

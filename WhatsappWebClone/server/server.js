@@ -49,7 +49,7 @@ app.post('/signup', async (req, res) => {
     const salt = bcrypt.genSaltSync(10);
     const hashedPassword = bcrypt.hashSync(password, salt);
     try {
-        await pool.query('INSERT INTO users (email, hashed_password, name, status) VALUES ($1, $2, $3, $4)', [email, hashedPassword,"user","Hey there! I am using get2connect!"]);
+        await pool.query('INSERT INTO users (email, hashed_password, name, status, url) VALUES ($1, $2, $3, $4, $5)', [email, hashedPassword,"user","Hey there! I am using get2connect!","uploads/default.jpg"]);
         const accessToken = token.sign({ email: email }, "secret", { expiresIn: "1h" });
         res.json({ email: email, accessToken: accessToken });
     } catch (error) {

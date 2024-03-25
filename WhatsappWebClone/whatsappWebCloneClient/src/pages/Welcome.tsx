@@ -3,13 +3,15 @@ import { styles } from '../assets/welcomeStyles';
 import backgroundGif from '../assets/media/WelcomeBg.mp4';
 import { useNavigate } from 'react-router-dom';
 import ToastMessage from '../components/ToastContainer';
+import { useAppContext } from '../components/Contexts/appContext';
+
 
 const Welcome = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [signUpClick, setSignUpClick] = useState(false);
     const [passwordCheck, setPasswordCheck] = useState('');
-    const [toast, setToast] = useState("");
+    const { toast, setToast } = useAppContext().toastContext;
     const navigate = useNavigate();
     const serverUrl = import.meta.env.VITE_BASE_URL;
 

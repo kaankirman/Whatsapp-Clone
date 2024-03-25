@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import Welcome from "../pages/Welcome";
 import Home from "../pages/Home";
 import App from "../pages/App";
+import { AppContextProvider } from "../components/Contexts/appContext";
 
 const isAuthenticated = () => {
     const accessToken = localStorage.getItem('accessToken');
@@ -28,7 +29,7 @@ const ProtectedRoute = ({ element }: { element: JSX.Element }) => {
 export const Routes = createBrowserRouter([
     {
         path: "/",
-        element: <App />,
+        element: <AppContextProvider> <App /></AppContextProvider>,
         children: [
             { path: "", element: <Welcome /> },
             { path: "home", element: <ProtectedRoute element={<Home />} /> },

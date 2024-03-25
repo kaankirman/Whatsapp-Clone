@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'react-bootstrap/Image';
 import { chatBoxStyle } from '../assets/homeStyles';
 import { io } from 'socket.io-client';
@@ -40,9 +40,12 @@ const ChatBox: React.FC<ChatBoxProps> = ({ userData, friendCount }) => {
     const { setToast } = useAppContext().toastContext;
     const { notifications, updateNotifications } = useAppContext().notificationContext;
     const [currentConversation, setCurrentConversation] = useState(selectedConversation);
+    const notificationsRef = useRef(notifications);
 
-
-
+    useEffect(() => {
+        notificationsRef.current = notifications;
+    }, [notifications]);
+    
     useEffect(() => {
         if (currentConversation?.conversationId === selectedConversation?.conversationId) {
             return;
@@ -66,26 +69,13 @@ const ChatBox: React.FC<ChatBoxProps> = ({ userData, friendCount }) => {
         }
     }, [selectedConversation]);
 
-    const handleReceiveMessage = (message: string, conversationId: number) => {
-        const receivedMessageIds = new Set<number>();
-        if (receivedMessageIds.has(conversationId)) {
-            return;
-        }
-        receivedMessageIds.add(conversationId);
-        if (selectedConversationId === conversationId) {
-            displayIncomingMessage(message, new Date().toISOString().split('T')[1].substr(0, 5));
-        } else {
-            const currentNotification = notifications[conversationId] || { count: 0 };
-            const updatedNotification = { count: currentNotification.count + 1 };
-            updateNotifications(conversationId, updatedNotification);
-        }
-        handleAddMessagesToState(conversationId, { sender_id: "other", message_text: message, send_at: new Date().toISOString() });
+    useEffect(() => {
+        socket.on('receive-message', handleReceiveMessage);
+
         return () => {
             socket.off('receive-message', handleReceiveMessage);
         };
-    };
-
-    socket.on('receive-message', handleReceiveMessage);
+    }, []);
 
     useEffect(() => {
         if (friendCount === Object.keys(messages).length) {
@@ -96,6 +86,17 @@ const ChatBox: React.FC<ChatBoxProps> = ({ userData, friendCount }) => {
             setIsLoaded(true)
         }
     }, [messages]);
+
+    const handleReceiveMessage = (message: string, conversationId: number) => {
+        if (selectedConversationId === conversationId) {
+            displayIncomingMessage(message, new Date().toISOString().split('T')[1].substr(0, 5));
+        } else {
+            const currentNotification = notificationsRef.current[conversationId];
+            const updatedNotification = { count: currentNotification.count + 1 };
+            updateNotifications(conversationId, updatedNotification);
+        }
+        handleAddMessagesToState(conversationId, { sender_id: "other", message_text: message, send_at: new Date().toISOString() });
+    };
 
     const sendMessage = () => {
         if (message.trim() === '') return;
@@ -140,36 +141,36 @@ const ChatBox: React.FC<ChatBoxProps> = ({ userData, friendCount }) => {
     };
 
     const displayIncomingMessage = (message: string, messageTime: string) => {
-    const chatContent = document.getElementById('chatContent');
-    if (chatContent) {
-        const messageDiv = document.createElement('div');
-        const timeDiv = document.createElement('div');
-        messageDiv.textContent = message;
-        timeDiv.textContent = messageTime;
-        Object.assign(messageDiv.style, chatBoxStyle.incomingMessageText);
-        Object.assign(timeDiv.style, chatBoxStyle.incomingMessageTimeText);
-        messageDiv.appendChild(timeDiv);
-        chatContent.appendChild(messageDiv);
-        chatContent.scrollTop = chatContent.scrollHeight;
-    }
-};
+        const chatContent = document.getElementById('chatContent');
+        if (chatContent) {
+            const messageDiv = document.createElement('div');
+            const timeDiv = document.createElement('div');
+            messageDiv.textContent = message;
+            timeDiv.textContent = messageTime;
+            Object.assign(messageDiv.style, chatBoxStyle.incomingMessageText);
+            Object.assign(timeDiv.style, chatBoxStyle.incomingMessageTimeText);
+            messageDiv.appendChild(timeDiv);
+            chatContent.appendChild(messageDiv);
+            chatContent.scrollTop = chatContent.scrollHeight;
+        }
+    };
 
-const displayOutgoingMessage = (message: string, messageTime: string) => {
-    if (message.trim() === '') return;
+    const displayOutgoingMessage = (message: string, messageTime: string) => {
+        if (message.trim() === '') return;
 
-    const chatContent = document.getElementById('chatContent');
-    if (chatContent) {
-        const messageDiv = document.createElement('div');
-        const timeDiv = document.createElement('div');
-        messageDiv.textContent = message;
-        timeDiv.textContent = messageTime;
-        Object.assign(messageDiv.style, chatBoxStyle.outgoingMessageText);
-        Object.assign(timeDiv.style, chatBoxStyle.outgoingMessageTimeText);
-        messageDiv.appendChild(timeDiv);
-        chatContent.appendChild(messageDiv);
-        chatContent.scrollTop = chatContent.scrollHeight;
-    }
-};
+        const chatContent = document.getElementById('chatContent');
+        if (chatContent) {
+            const messageDiv = document.createElement('div');
+            const timeDiv = document.createElement('div');
+            messageDiv.textContent = message;
+            timeDiv.textContent = messageTime;
+            Object.assign(messageDiv.style, chatBoxStyle.outgoingMessageText);
+            Object.assign(timeDiv.style, chatBoxStyle.outgoingMessageTimeText);
+            messageDiv.appendChild(timeDiv);
+            chatContent.appendChild(messageDiv);
+            chatContent.scrollTop = chatContent.scrollHeight;
+        }
+    };
 
     const clearChatContent = () => {
         const chatContent = document.getElementById('chatContent');
