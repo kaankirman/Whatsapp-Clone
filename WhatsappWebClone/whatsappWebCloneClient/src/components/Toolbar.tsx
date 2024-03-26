@@ -58,6 +58,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ userData }) => {
                     senderName: userData.name,
                     senderId: userData.email,
                     receiverId: addFriendText,
+                    url: userData.url,
                 }),
             });
 
@@ -140,9 +141,9 @@ const Toolbar: React.FC<ToolbarProps> = ({ userData }) => {
                                 <img src={addIcon} style={toolbarStyle.addIcon} onClick={handleAddFriend} alt="" />
                             </div>
                             <div style={toolbarStyle.friendListPendingContainer}>
-                                {friendRequests.map((friendRequest: { sender_id: string; sender_name: string; request_id: number; }) => (
+                                {friendRequests.map((friendRequest: { sender_id: string; sender_name: string; request_id: number; url:string }) => (
                                     <li key={friendRequest.sender_id}>
-                                        <FriendRequest email={friendRequest.sender_id} name={friendRequest.sender_name} requestId={friendRequest.request_id} />
+                                        <FriendRequest email={friendRequest.sender_id} name={friendRequest.sender_name} requestId={friendRequest.request_id} url={friendRequest.url} />
                                     </li>
                                 ))}
                             </div>

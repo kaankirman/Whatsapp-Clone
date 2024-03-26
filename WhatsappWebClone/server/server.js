@@ -49,7 +49,7 @@ app.post('/signup', async (req, res) => {
     const salt = bcrypt.genSaltSync(10);
     const hashedPassword = bcrypt.hashSync(password, salt);
     try {
-        await pool.query('INSERT INTO users (email, hashed_password, name, status, url) VALUES ($1, $2, $3, $4, $5)', [email, hashedPassword,"user","Hey there! I am using get2connect!","uploads/default.png"]);
+        await pool.query('INSERT INTO users (email, hashed_password, name, status, url) VALUES ($1, $2, $3, $4, $5)', [email, hashedPassword, "user", "Hey there! I am using get2connect!", "uploads/default.png"]);
         const accessToken = token.sign({ email: email }, "secret", { expiresIn: "1h" });
         res.json({ email: email, accessToken: accessToken });
     } catch (error) {
@@ -80,7 +80,7 @@ app.post('/login', async (req, res) => {
 //logout
 app.post('/logout', (req, res) => {
     const token = req.headers.authorization;
-    
+
     if (!token) {
         return res.status(401).json({ message: 'Unauthorized' });
     }
@@ -129,7 +129,7 @@ app.patch('/users/:email', upload.single('image'), async (req, res) => {
             queryParams.push(imagePath);
             queryIndex++;
 
-            if (prevImage) {
+            if (prevImage && prevImage !== 'uploads/default.png') {
                 fs.unlinkSync(path.join(__dirname, prevImage));
             }
         }
@@ -149,7 +149,7 @@ app.patch('/users/:email', upload.single('image'), async (req, res) => {
 
 //send friend request
 app.post('/friendRequests', async (req, res) => {
-    const { senderId, receiverId, senderName } = req.body;
+    const { senderId, receiverId, senderName, url } = req.body;
 
     try {
         // Check if receiverId exists in the users table
@@ -178,8 +178,8 @@ app.post('/friendRequests', async (req, res) => {
 
         // Insert the friend request into the friend_requests table
         const result = await pool.query(
-            'INSERT INTO friend_requests (sender_id, receiver_id, status, sender_name) VALUES ($1, $2, $3, $4) RETURNING *',
-            [senderId, receiverId, 'pending', senderName]
+            'INSERT INTO friend_requests (sender_id, receiver_id, status, sender_name, url) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+            [senderId, receiverId, 'pending', senderName, url]
         );
 
         res.json(result.rows[0]);

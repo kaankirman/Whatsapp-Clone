@@ -201,6 +201,7 @@ export const friendRequestStyle: FriendRequestStyles = {
     width: "40px",
     height: "40px",
     borderRadius: "50%",
+    objectFit: "cover",
   },
   text: {
     margin: "0px",
@@ -286,7 +287,7 @@ export const chatStyle: ChatStyles = {
     margin: "0",
     paddingTop: "5px",
     color: "#b3b1b1",
-    width: "100px",
+    width: "180px",
     overflow: "hidden",
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
@@ -393,6 +394,7 @@ export const chatBoxStyle: ChatBoxStyles = {
     width: "50px",
     height: "50px",
     borderRadius: "50%",
+    objectFit: "cover",
   },
   userName: {
     margin: "0",

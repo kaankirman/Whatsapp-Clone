@@ -9,12 +9,14 @@ interface FriendRequestProps {
     email: string;
     name: string;
     requestId: number;
+    url: string;
 }
 
-function FriendRequest({ email, name, requestId }: FriendRequestProps) {
+function FriendRequest({ email, name, requestId, url }: FriendRequestProps) {
     const serverUrl = import.meta.env.VITE_BASE_URL;
     const [isRequestAccepted, setIsRequestAccepted] = useState(true);
     const { setToast } = useAppContext().toastContext;
+    const requestImage = `${serverUrl}/${url}`
 
 
     const handleRequest = async () => {
@@ -84,7 +86,7 @@ function FriendRequest({ email, name, requestId }: FriendRequestProps) {
     return (
         <div id="friendRequest">
             <div style={friendRequestStyle.mainContainer}>
-                <Image src={bg} roundedCircle style={friendRequestStyle.image} />
+                <Image src={requestImage} roundedCircle style={friendRequestStyle.image} />
                 <div style={friendRequestStyle.textContainer}>
                     <h3 style={friendRequestStyle.text}>{name}</h3>
                     <h4 style={friendRequestStyle.emailText}>{email}</h4>
