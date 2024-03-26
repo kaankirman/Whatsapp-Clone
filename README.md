@@ -12,7 +12,9 @@ Error Handling and Logging: Comprehensive error handling mechanisms detect and m
 
 Scalability and Performance: The application architecture is designed for scalability and high performance, capable of handling large volumes of concurrent connections and messages. Optimizations minimize latency and maximize throughput, ensuring a smooth and responsive user experience.
 
-Ts, REACT | Node.js, Express.js | Postgreslq
+Technologies Used: Ts, REACT | Node.js, Express.js | Postgreslq
+
+The app is responsive
 
 
 Desktop View:
