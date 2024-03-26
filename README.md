@@ -14,9 +14,6 @@ Scalability and Performance: The application architecture is designed for scalab
 
 Ts, REACT | Node.js, Express.js | Postgreslq
 
-Demo:
-
-https://github.com/kaankirman/Whatsapp-Clone/assets/65332708/7d865196-df25-4690-ab35-341cc54c67d6
 
 Desktop View:
 
@@ -33,3 +30,7 @@ Phone View:
 ERD:
 
 ![ERD](https://github.com/kaankirman/Whatsapp-Clone/assets/65332708/70b7f6d6-749b-4e86-84ff-04ae7e986ea7)
+
+Demo:
+
+https://github.com/kaankirman/Whatsapp-Clone/assets/65332708/7d865196-df25-4690-ab35-341cc54c67d6
