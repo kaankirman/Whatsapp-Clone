@@ -19,7 +19,12 @@ Desktop View:
 
 ![login](https://github.com/kaankirman/Whatsapp-Clone/assets/65332708/6b61408a-ee93-4f28-aa4a-5ab557f8d61b)
 
+![friendRequests](https://github.com/kaankirman/Whatsapp-Clone/assets/65332708/17eab427-779a-421f-91d5-d1afd802732c)
+
 ![Capture](https://github.com/kaankirman/Whatsapp-Clone/assets/65332708/0dfb5e5a-9cb4-4a1f-b43c-3010dacb340f)
+
+![profile](https://github.com/kaankirman/Whatsapp-Clone/assets/65332708/31087c63-c3a4-4b68-84cc-f166c3742f10)
+
 
 Phone View:
 
