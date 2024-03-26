@@ -7,7 +7,8 @@ Node.js and Express are used for back-end.
 Postgresql is used as the database.
 
 Demo:
-https://github.com/kaankirman/Whatsapp-Clone/assets/65332708/260ff5d2-2c0a-4187-9a7d-b1004a92b856
+
+https://github.com/kaankirman/Whatsapp-Clone/assets/65332708/7d865196-df25-4690-ab35-341cc54c67d6
 
 Desktop View:
 
